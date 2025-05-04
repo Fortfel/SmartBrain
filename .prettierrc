@@ -1,0 +1,10 @@
+{
+    "tailwindStylesheet": "./src/style/index.css",
+    "plugins": ["prettier-plugin-tailwindcss"],
+    "tailwindFunctions": ["clsx","tw"],
+    "tailwindPreserveWhitespace": true,
+    "semi": false,
+    "singleQuote": true,
+    "trailingComma": "all",
+    "printWidth": 120
+}

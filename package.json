@@ -1,0 +1,68 @@
+{
+  "name": "basic-react-ts",
+  "private": true,
+  "version": "1.0.0",
+  "main": "index.html",
+  "author": "https://twitter.com/Fortel91",
+  "description": "A simple starter to get up and running with React, TypeScript, Tailwind and Vite",
+  "type": "module",
+  "scripts": {
+    "vite": "vite",
+    "dev": "npm-run-all --parallel watch:tsc vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "watch:tsc": "tsc --noEmit --watch",
+    "lint": "eslint ./src/**/*.{ts,tsx}",
+    "lint:fix": "eslint ./src/**/*.{ts,tsx} --fix",
+    "docs": "typedoc",
+    "watch:docs": "typedoc --watch"
+  },
+  "dependencies": {
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.25.1",
+    "@tailwindcss/forms": "^0.5.10",
+    "@tailwindcss/typography": "^0.5.16",
+    "@tailwindcss/vite": "^4.1.4",
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.2",
+    "@vitejs/plugin-legacy": "^6.1.0",
+    "@vitejs/plugin-react-swc": "^3.9.0",
+    "browser-sync": "^3.0.4",
+    "eslint": "^9.25.1",
+    "eslint-config-prettier": "^10.1.2",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-react-compiler": "^19.1.0-rc.1",
+    "eslint-plugin-react-dom": "^1.48.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.20",
+    "eslint-plugin-react-x": "^1.48.5",
+    "eslint-plugin-tsdoc": "^0.4.0",
+    "globals": "^16.0.0",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^3.5.3",
+    "prettier-plugin-tailwindcss": "^0.6.11",
+    "tailwindcss": "^4.1.4",
+    "typedoc": "^0.28.3",
+    "typescript": "~5.8.3",
+    "typescript-eslint": "^8.31.0",
+    "vite": "^6.3.3",
+    "vite-plugin-browser-sync": "^4.0.0",
+    "vite-tsconfig-paths": "^5.1.4"
+  },
+  "typedocOptions": {
+    "entryPoints": [
+      "src/main.tsx",
+      "src/utils/index.ts"
+    ],
+    "out": "docs",
+    "tsconfig": "tsconfig.json",
+    "includeVersion": true,
+    "readme": "README.md"
+  },
+  "browserslist": [
+    "defaults"
+  ]
+}
