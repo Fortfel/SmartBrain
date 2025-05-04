@@ -62,12 +62,12 @@ export default tseslint.config(
       ],
       'import/no-default-export': 'error',
       // In case of exceptions disable the rule
-      // overrides: [
-      //   {
-      //     files: ['src/pages/**/*'],
-      //     rules: { 'import/no-default-export': 'off' },
-      //   },
-      // ],
+      overrides: [
+        {
+          files: ['src/assets/**/*'],
+          rules: { 'import/no-default-export': 'off' },
+        },
+      ],
       'no-unused-vars': 'off',
       '@typescript-eslint/switch-exhaustiveness-check': 'error',
       '@typescript-eslint/ban-ts-comment': [

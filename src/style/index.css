@@ -2,7 +2,11 @@
 @import 'tailwindcss/preflight.css' layer(base); /* comment this line to disable preflight */
 @import 'tailwindcss/utilities.css' layer(utilities);
 
-@plugin "@tailwindcss/typography";
+/*@plugin "@tailwindcss/typography";*/
 @plugin "@tailwindcss/forms";
 
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+/* dausyUI */
+@plugin "daisyui" {
+  themes: dark --default;
+}
