@@ -2,11 +2,27 @@
 @import 'tailwindcss/preflight.css' layer(base); /* comment this line to disable preflight */
 @import 'tailwindcss/utilities.css' layer(utilities);
 
+@import "./plugins/horizontal-line.css";
+@import "./plugins/animations.css";
+
 /*@plugin "@tailwindcss/typography";*/
 @plugin "@tailwindcss/forms";
 
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
 /* dausyUI */
 @plugin "daisyui" {
   themes: dark --default;
+}
+
+@layer theme {
+  .hero-background {
+    background: url('/src/assets/img/noise.png'), radial-gradient(circle at top center, #8e2de2, #563277 25%, #4a378c, #4066a8 65%, #32517380);
+    mask-image: radial-gradient(ellipse 150% 35% at center center, #000 20%, #00000080 50%, #0000);
+    @apply absolute opacity-60 inset-0 -top-[10%] -z-2 transition duration-500;
+
+    @variant xl {
+      mask-image: radial-gradient(ellipse 80% 40% at center center, #000 20%, #00000080 50%, #0000);
+    }
+  }
 }
