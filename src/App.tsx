@@ -28,7 +28,7 @@ const App = (): React.JSX.Element => {
   return (
     <>
       {/*<div className="absolute inset-0 -z-30 h-full w-full bg-[linear-gradient(to_right,#80808034_1px,transparent_1px),linear-gradient(to_bottom,#80808034_1px,transparent_1px)]  bg-size-[50px_50px]"></div>*/}
-      <div className={`relative overflow-x-hidden`}>
+      <div className={`relative flex flex-col gap-15 overflow-x-hidden`}>
         <div className="hero-background"></div>
 
         <Header

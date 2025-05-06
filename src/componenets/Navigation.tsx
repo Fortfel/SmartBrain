@@ -10,9 +10,9 @@ const Navigation = ({ isLoggedIn, ...themeControllerProps }: NavigationProps): R
   const loginButton = <a className="cursor-pointer text-lg font-bold">{isLoggedIn ? 'Sign Out' : 'Sign In'}</a>
 
   return (
-    <nav className="line-b flex w-full items-center gap-2 px-2 py-5 text-base-content sm:gap-4 sm:px-5 [&_a:hover]:text-base-content/80">
+    <nav className="line-b flex w-full items-center gap-2 px-2 py-5 text-base-content sm:gap-4 sm:px-5 [&_a:hover]:text-current/70">
       <div className="flex flex-1 cursor-default items-center gap-2">
-        <Brain className="size-6 fill-base-content" />
+        <Brain className="size-6 fill-current" />
         <h2 className="text-2xl font-bold">SmartBrain</h2>
       </div>
       {loginButton}
