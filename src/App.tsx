@@ -6,7 +6,7 @@ import { loadPolygonMaskPlugin } from '@tsparticles/plugin-polygon-mask'
 // import { loadFull } from 'tsparticles' // if you are going to use `loadFull`, install the "tsparticles" package too.
 import { loadSlim } from '@tsparticles/slim' // if you are going to use `loadSlim`, install the "@tsparticles/slim" package too.
 // import { loadBasic } from '@tsparticles/basic' // if you are going to use `loadBasic`, install the "@tsparticles/basic" package too.
-import { particlesOptions, options, logo1, logo2 } from '@/assets/particlesOptions.ts'
+import { particlesOptions, options, logo1, logo2, logo3 } from '@/assets/particlesOptions.ts'
 
 import { Header } from '@/componenets/Header.tsx'
 import { MainContent } from '@/componenets/MainContent.tsx'
@@ -26,9 +26,251 @@ const App = (): React.JSX.Element => {
 
   const particlesOptionsWithTheme: ISourceOptions = React.useMemo(() => {
     return {
-      ...logo1,
+      // ...logo1,
+      // ...logo2,
+      // ...particlesOptions,
+      // ...options,
+      ...logo3,
+
+      // ...particlesOptions,
+      // background: {
+      //   ...particlesOptions.background,
+      //   color: {
+      //     ...particlesOptions.background.color,
+      //     value: isDarkMode ? '#333' : '#666',
+      //     value: 'transparent',
+      //   },
+      // },
     }
   }, [isDarkMode])
+
+  const particlesOptions = React.useMemo(() => {
+    return {
+      autoPlay: true,
+      background: {
+        color: 'transparent',
+      },
+      detectRetina: true,
+      fpsLimit: 60,
+      fullScreen: { enable: true, zIndex: 0 },
+      interactivity: {
+        detectsOn: 'canvas',
+        events: {
+          onHover: {
+            enable: true,
+            mode: 'bubble',
+          },
+          resize: true,
+        },
+        modes: {
+          bubble: {
+            color: isDarkMode ? '#f8f8f8' : '#333',
+            distance: 100,
+            duration: 2,
+            opacity: 1,
+            size: 10,
+            speed: 3,
+          },
+        },
+      },
+      particles: {
+        color: {
+          value: '#fff',
+        },
+        links: {
+          blink: false,
+          color: '#fff',
+          consent: false,
+          distance: 20,
+          enable: true,
+          opacity: 0.8,
+          width: 1,
+        },
+        move: {
+          attract: {
+            enable: false,
+            rotate: {
+              x: 600,
+              y: 1200,
+            },
+          },
+          bounce: false,
+          direction: 'none',
+          enable: true,
+          outModes: {
+            default: 'bounce',
+          },
+          random: false,
+          speed: 1,
+          straight: false,
+        },
+        number: {
+          density: {
+            enable: false,
+            area: 2000,
+          },
+          limit: 0,
+          value: 400,
+        },
+        opacity: {
+          animation: {
+            enable: true,
+            minimumValue: 0.3,
+            speed: 0.5,
+            sync: false,
+          },
+          random: { enable: true, minimumValue: 0.3 },
+          value: 0.8,
+        },
+        shape: {
+          type: 'circle',
+        },
+        size: {
+          value: 1,
+        },
+      },
+      polygon: {
+        move: {
+          radius: 10,
+        },
+        inline: {
+          arrangement: 'equidistant',
+        },
+        scale: 1,
+        type: 'inline',
+        position: {
+          x: 20,
+          y: 40,
+        },
+        data: {
+          url: null,
+          path: 'M129.6,200.8c0,62.6-26.5,78.4-80.2,105c6.9,4.6,16.2,10.1,32,17.6c41.4-19.6,81.4-45.3,81.4-113.8V65.1h-33.2V200.8z M98.1,65.1H0v28.7h65v91.9c0,42-2.5,45.9-57.1,70.5c3.8,9.6,9.3,19,16.5,27.5c61.7-27.5,73.7-41.7,73.7-89.3V65.1z',
+          size: {
+            width: 162.7,
+            height: 323.3,
+          },
+        },
+      },
+    } as const satisfies ISourceOptions
+  }, [])
+  const particlesOptions2 = React.useMemo(() => {
+    // Documentation
+    // https://particles.js.org/docs/interfaces/tsParticles_Engine.Options_Interfaces_IOptions.IOptions.html
+    return {
+      autoPlay: true,
+      clear: true,
+      delay: 0,
+      detectRetina: true,
+      fpsLimit: 120,
+      fullScreen: false,
+      // pauseOnBlur: true,
+      // pauseOnOutsideViewport: true,
+      style: {},
+      themes: [
+        {
+          name: 'dark',
+          options: {
+            background: {
+              color: {
+                value: '#333',
+              },
+            },
+            particles: {
+              color: {
+                value: '#fff',
+              },
+              links: {
+                color: '#fff',
+              },
+            },
+          },
+        },
+      ],
+      interactivity: {
+        detectsOn: 'canvas',
+        events: {
+          onHover: {
+            enable: true,
+            mode: 'bubble',
+          },
+          resize: {
+            enable: true,
+            delay: 0.5,
+          },
+        },
+        modes: {
+          bubble: {
+            distance: 40,
+            duration: 2,
+            opacity: 8,
+            size: 6,
+          },
+        },
+      },
+      particles: {
+        color: {
+          value: ['#4285f4', '#34A853', '#FBBC05', '#EA4335'],
+        },
+        links: {
+          color: 'random',
+          distance: 40,
+          enable: true,
+          opacity: 0.8,
+          width: 1,
+        },
+        move: {
+          direction: 'none',
+          enable: true,
+          outModes: 'bounce',
+          speed: 1,
+        },
+        number: {
+          value: 200,
+        },
+        opacity: {
+          animation: {
+            enable: true,
+            speed: 2,
+            sync: false,
+          },
+          value: { min: 0.3, max: 0.8 },
+        },
+        shape: {
+          type: 'circle',
+        },
+        size: {
+          value: 1,
+        },
+      },
+      polygon: {
+        enable: true,
+        draw: {
+          enable: true,
+          stroke: {
+            color: '#fff',
+            opacity: 0.2,
+            width: 1,
+          },
+        },
+        move: {
+          radius: 5,
+          type: 'path',
+        },
+        position: {
+          x: 30,
+          y: 0,
+        },
+        inline: {
+          arrangement: 'equidistant',
+        },
+        scale: 1,
+        type: 'inline',
+        data: {
+          path: 'M206 1.5c-20.6 3.8-47 16.1-68.5 31.9-3.8 2.8-10.5 7.3-14.7 9.9-16.2 10-25 25.6-25 44.2 0 5.4.6 11.2 1.6 14.4.9 3 1.5 5.5 1.3 5.6-.1.1-2.4.8-5.2 1.4-22.4 5.5-42.8 26.3-49.1 50.1-2.1 7.9-2.3 23.2-.5 31.6l1.3 6-5.1 6.8c-10.7 14.1-15.1 27-15.1 44 0 12.3 2.4 21.9 8 32.4l3.9 7.3-2.9 4.7c-5.4 8.9-8.3 19.5-8.8 32.2-.4 13.1 1 21.1 5.7 31.4 5.3 11.7 14.8 23.1 24.5 29.2l4.3 2.7.6 12.1c.8 17 4.3 28.2 13 41.8 7.5 11.6 23 24.3 36 29.4 4 1.5 6.1 3.4 11.3 10.1 21.4 27.4 55.5 37.7 88.1 26.8 15.9-5.4 31.5-17.5 40.3-31.4 2.5-3.9 4.7-7 5-7s2.5 3.1 5 7c21.1 33.3 66.5 45.3 101.8 26.9 10.5-5.4 18.9-12.5 26.6-22.3 5.2-6.7 7.3-8.6 11.3-10.1 12.9-5.1 28.6-17.9 36.1-29.6 8.5-13.4 12.1-24.7 12.9-41.6l.6-12.1 4.3-2.7c9.7-6.1 19.2-17.5 24.5-29.2 4.7-10.3 6.1-18.3 5.7-31.4-.5-12.7-3.4-23.3-8.8-32.2l-2.9-4.7 3.9-7.3c5.6-10.5 8-20.1 8-32.4 0-17-4.4-29.9-15.1-44l-5.1-6.8 1.3-6c1.8-8.4 1.6-23.7-.5-31.6-6.3-23.8-26.7-44.6-49.1-50.1-2.7-.6-5.1-1.3-5.2-1.4-.2-.1.4-2.6 1.3-5.6 1-3.2 1.6-9 1.6-14.4 0-18.6-8.8-34.2-25-44.2-4.2-2.6-10.8-7.1-14.7-9.9C347.6 13.6 313.9 0 291.6 0c-11.5 0-24 5.4-31.7 13.7L256 18l-3.9-4.3C241.2 1.9 226-2.1 206 1.5m26.4 18c5.3 2.6 10.4 7.9 13 13.4 2.1 4.5 2.1 5.9 2.4 61.4.2 46.4.1 56.7-1 56.1-.7-.4-2.4-1.5-3.8-2.5-6.7-4.6-22.3-7.4-27-4.9-2.4 1.3-4.1 6.5-3.1 9.3 1.4 3.6 3.6 4.8 11 6.2 10.7 2.1 17.1 6.8 21.3 16l2.3 5 .3 102.5.2 102.5-7.2-7.1c-8.4-8.2-14.4-12.4-23.1-16.4-8.7-3.9-14.8-5-18-3.4-4.6 2.4-5.5 9.9-1.5 13.1.7.6 4 2.1 7.3 3.4 20.6 7.6 35.5 24.1 40.5 44.9 1.7 7.1 1.7 20.9.1 28-1.9 8.2-8.5 20.9-14.1 27.2-6.5 7.3-16.8 14.2-26 17.5-9.8 3.5-25.4 4.3-35.1 1.9-15.5-3.9-30.3-14.7-38.8-28.1-3.6-5.6-4.7-6.6-9.6-8.4-11.4-4.3-17.7-8.2-25.4-15.9-5.7-5.7-8.6-9.6-11.3-15.2-5.8-12-7.1-18.5-6.5-32.7.6-14.3 0-15.6-8.6-20-7.4-3.7-17.7-14.4-21.6-22.4-4.8-9.8-6.8-21.2-5.3-31.1.6-4.4 2.3-10.6 3.8-13.8l2.7-6 4.6 3.4C66 311.5 81.7 317 93.7 317c5.5 0 6.8-.4 8.8-2.5 5.2-5.1 1.3-13.5-6.2-13.5-24.6-.1-48.1-20.4-52.3-45.1-2.9-16.9 2-32.2 14.5-45.8 7.2-7.9 7.6-9.3 5-17.7-.9-2.7-1.8-8.7-2.2-13.4-1-15.6 4.2-28.8 16.1-40.6 10.7-10.5 22.5-15.4 37.1-15.4 14.4 0 26.4 5 37.1 15.5 10 9.8 16.3 23.4 16.4 35.5.1 7.5 5 11.9 11 9.9 4.9-1.8 6.2-5.9 5-15.6-1.8-13.8-6.7-25.4-15.5-36.3-11.3-14.1-24.9-21.5-47.3-25.6-4.1-.8-6.7-8.3-6.7-18.9.1-7.8.4-9.7 2.8-14.5 3.9-7.5 10.8-14.3 18.1-17.7 5.2-2.4 7.4-2.8 14.6-2.8 7.1 0 9.4.4 14.1 2.6 6.9 3.2 13.2 8.8 16.6 14.6 4.6 7.9 9.4 9.3 14.4 4.4 1.6-1.6 2.9-4 2.9-5.3 0-3.6-5.2-11.8-11.6-18.1-5.3-5.3-17.6-12.7-21-12.7-8.9 0 19.8-14.6 37.5-19 9.9-2.5 23.9-2.3 29.5.5m76.2-.5c17.6 4.2 47.2 19 38 19-3.4 0-15.7 7.4-21 12.7C319.2 57 314 65.2 314 68.8c0 1.3 1.3 3.7 2.9 5.3 5 4.9 9.8 3.5 14.4-4.4 3.4-5.8 9.7-11.4 16.6-14.6 4.7-2.2 7-2.6 14.1-2.6 7.2 0 9.4.4 14.6 2.8 7.3 3.4 14.2 10.2 18.1 17.7 2.4 4.8 2.7 6.7 2.8 14.5 0 10.6-2.6 18.1-6.7 18.9-22.4 4.1-36 11.5-47.3 25.6-8.8 10.9-13.7 22.5-15.5 36.3-1.2 9.7.1 13.8 5 15.6 6 2 10.9-2.4 11-9.9.1-12.1 6.4-25.7 16.4-35.5 10.7-10.5 22.7-15.5 37.1-15.5 14.6 0 26.4 4.9 37.1 15.4 11.9 11.8 17.1 25 16.1 40.6-.4 4.7-1.3 10.7-2.2 13.4-2.6 8.4-2.2 9.8 5 17.7 12.5 13.6 17.4 28.9 14.5 45.8-4.2 24.7-27.7 45-52.3 45.1-7.5 0-11.4 8.4-6.2 13.5 6.3 6.4 31.8.4 47.6-11.1l4.6-3.4 2.7 6c8.6 19.2 4 42.7-11.3 58.1-3.6 3.6-8.9 7.8-11.8 9.2-8.6 4.4-9.2 5.7-8.6 20 .6 14.2-.7 20.7-6.5 32.7-2.7 5.6-5.6 9.5-11.3 15.2-7.7 7.7-14 11.6-25.4 15.9-4.9 1.8-6 2.8-9.6 8.4-8.5 13.4-23.3 24.2-38.8 28.1-9.7 2.4-25.3 1.6-35.1-1.9-15.2-5.4-27.9-16.7-34.9-31.1-7-14.5-6.6-3.6-6.6-168.1v-149l2.1-4.5c4-8.5 14.4-16 22.2-16 4.7 0 9-2.5 9.9-5.8 1.5-5.5-.7-9.6-5.7-10.7-4.4-1-14.8 1.4-21.4 4.8-3.4 1.8-6.5 3.3-6.9 3.5-1.4.7-.3-76.9 1.1-80.3 3.4-7.8 8.9-13.2 16.7-16.2 4.7-1.8 17.1-1.5 26.1.7 M109.4 170.3c-2.7 2.4-2.9 2.9-2.8 9.9.6 29.2 22.8 56.4 52.2 63.9 4.1 1 7.7 2 7.9 2.2.7.8-1.9 7.3-4.8 11.8-3.3 5.1-10.3 10.9-16.3 13.4-1.9.8-6.5 1.9-10.2 2.4-7.9 1.2-11.4 3.8-11.4 8.6 0 3.5 2.9 7.2 6.3 8 3.1.8 14.7-1.1 21.2-3.6 6.6-2.5 15.7-9 20.8-15 4.3-5 9-14.2 10.7-20.9l1.1-4.5 8-1.8c14-3.2 32.7-14.5 35.9-21.9 1.7-3.9.1-7.9-3.9-10-4.2-2.1-6.6-1.3-12.9 4.3-5.8 5.1-16.9 10.4-24.6 11.8-18.3 3.3-34.5-1.8-47.6-14.9-9.9-9.8-14.3-19.2-15.9-33.5-1-8.6-2.6-11-7.7-12.1-2.4-.5-3.7 0-6 1.9 M178.4 311.5c-28.8 6.2-51.6 32.5-54.1 62.2l-.6 7.3-5.7-.2c-9.1-.3-13.9 4.5-10.8 11 1.8 3.6 4.8 4.8 14.6 6.1 25.1 3.2 46.2 26.6 46.2 51.2 0 3.2.7 4.7 3 7.1 2.6 2.5 3.6 2.9 6.3 2.4 5.8-1.2 7.2-3.7 6.9-11.8-.9-23.9-17-48.4-38.6-59-5-2.4-5.1-2.5-4.6-12.8.7-16.9 13.1-35 29.5-43.1 6.1-3 17.4-5.9 23.3-5.9 7.1 0 11-9 5.9-13.8-1.9-1.8-3.5-2.2-8.8-2.1-3.5 0-9.2.7-12.5 1.4 M412 160.3c-3.4 1.7-4.7 4.8-5.9 14.5-2.7 21.2-19.4 39.8-40.2 44.7-17.1 4-33.7 0-47.4-11.4-7.1-5.9-11.1-6.6-15-2.6-5.4 5.3-2.1 11.6 10.6 20 8.2 5.5 16.5 9 25.2 10.7l6.5 1.2 1 4.7c4.6 19.8 22.9 36.1 43.8 39.1 7.3 1.1 8.5 1 10.8-.6 5.1-3.3 5.6-10.2 1.1-13.2-1.3-.9-5.4-2-9.1-2.5-8.1-1.1-17-5.6-21.9-11-3.6-4-8.5-12.8-8.5-15.2 0-.9 2.4-2 6.8-3 24.6-6 45-26.1 51.2-50.3 2.7-10.5 2.7-20.7 0-23.4-1.1-1.1-2.4-2-2.9-2s-1.5-.2-2.3-.5c-.7-.3-2.4.1-3.8.8 M287.3 293.1c-4.8 2.5-5.3 10.6-.7 13.6 1.3.8 5.8 1.9 10 2.4 9.9 1.1 15.9 3.1 23.1 7.8 15.3 9.9 25.2 27.6 25.3 45.1v5.6l-5.3 2.6c-7.1 3.5-19.4 13.5-23.8 19.5-8.7 11.6-13.7 24.5-14.6 37.8-.6 8-.5 8.4 2 10.9 6 6 13.1 1.9 14.1-8 1.6-14.3 5.5-23.6 14-33.1 9.3-10.3 21.2-16.2 36-17.8 5.3-.6 7.5-1.3 9.3-3.1 3.1-3.1 3-7.8-.2-10.9-2-2.1-3.4-2.5-8.4-2.5h-6l-.5-3.3c-1.8-13.2-2.7-17-5.1-23.2-7.8-19.7-23.8-34.7-43.9-41.1-9-2.8-21.9-4-25.3-2.3',
+        },
+      },
+    } as const satisfies ISourceOptions
+  }, [])
 
   React.useEffect(() => {
     localStorage.setItem('theme', isDarkMode ? 'dark' : 'light')
@@ -66,7 +308,7 @@ const App = (): React.JSX.Element => {
     <>
       {areParticlesLoaded && (
         <>
-          <Particles id="tsparticles" particlesLoaded={particlesLoaded} options={particlesOptionsWithTheme} />
+          <Particles id="tsparticles" particlesLoaded={particlesLoaded} options={particlesOptions2} />
         </>
       )}
       {/*<div className="absolute inset-0 -z-30 h-full w-full bg-[linear-gradient(to_right,#80808034_1px,transparent_1px),linear-gradient(to_bottom,#80808034_1px,transparent_1px)]  bg-size-[50px_50px]"></div>*/}
