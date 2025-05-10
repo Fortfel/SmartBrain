@@ -6,13 +6,17 @@
 @import "./plugins/animations.css";
 
 /*@plugin "@tailwindcss/typography";*/
-@plugin "@tailwindcss/forms";
+/*@plugin "@tailwindcss/forms";*/
 
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
 /* dausyUI */
 @plugin "daisyui" {
-  themes: dark --default;
+  themes: light --default, dark --prefersdark, synthwave;
+}
+
+@theme {
+  --font-courier: 'Courier New', Courier, monospace;
 }
 
 @layer theme {

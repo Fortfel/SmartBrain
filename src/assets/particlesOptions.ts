@@ -81,8 +81,10 @@ export const particlesOptions = {
       enable: true,
       blink: false, // Enables random blinking, if set to true and ILinks.color is set to "random" the link will have a random color each frame resulting in a blinking animation
       consent: false, // If enabled the links will have a single random color, if ILinks.color value is "random"
-      color: 'random',
-      distance: 20,
+      color: {
+        value: 'random',
+      },
+      distance: 22,
       opacity: 1,
       width: 1,
       triangles: {
@@ -100,7 +102,7 @@ export const particlesOptions = {
       outModes: 'bounce',
       random: false, // Sets if the speed will be randomized or not, maximum value is speed.
       size: false, // Sets if the particle speed will change based on the particle size, so bigger particles will move faster.
-      speed: 0.3,
+      speed: 0.1,
     },
     number: {
       value: 200,
@@ -131,7 +133,7 @@ export const particlesOptions = {
       },
     },
     move: {
-      radius: 2,
+      radius: 1,
       type: 'path',
     },
     position: {

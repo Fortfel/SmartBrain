@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { clsx } from 'clsx'
 import Tilt from 'react-parallax-tilt'
 import Brain from '@/assets/img/Brain.tsx'
 import Particles, { initParticlesEngine } from '@tsparticles/react'
@@ -42,6 +43,15 @@ const Header = ({ brainAnimationDuration, isDarkMode, ...navigationProps }: Head
     container?.loadTheme(isDarkMode ? 'dark' : 'light')
   }
 
+  const shinyEffect = clsx('absolute inset-0', {
+    // animation
+    'animate-shiny animate-shiny-duration-(--brain-animation-duration)': true,
+    // mask
+    'mask-radial-[70%_70%] mask-radial-from-40% mask-radial-to-70% mask-radial-at-center': true,
+    // light/dark
+    'animate-shiny-color-white/30 dark:animate-shiny-color-white/20': true,
+  })
+
   return (
     <header
       className="text-base-content line-color-base-content/20"
@@ -50,19 +60,19 @@ const Header = ({ brainAnimationDuration, isDarkMode, ...navigationProps }: Head
     >
       <div className="mx-auto flex max-w-[var(--breakpoint-lg)] flex-col items-center gap-7">
         <Navigation isDarkMode={isDarkMode} {...navigationProps} />
-        <Tilt scale={1.2}>
-          <div className="relative">
-            <Brain className="size-40 fill-current drop-shadow-lg/30" />
+        {/*<Tilt scale={1.2}>*/}
+        {/*  <div className="relative">*/}
+        {/*    <Brain className="size-40 fill-current drop-shadow-lg/30" />*/}
 
-            {/* Flickering effect */}
-            <div className="absolute inset-0 animate-visible-33-(--brain-animation-duration)">
-              <div className="h-full w-full animate-shiny mask-radial-[70%_80%] mask-radial-from-40% mask-radial-to-70% mask-radial-at-center animate-shiny-color-white/30 animate-shiny-duration-(--brain-animation-duration) dark:animate-shiny-color-white/20"></div>
-            </div>
-          </div>
-        </Tilt>
+        {/*    /!* Flickering effect *!/*/}
+        {/*    <div className="absolute inset-0 animate-visible-33-(--brain-animation-duration)">*/}
+        {/*      <div className="absolute inset-0 animate-shiny mask-radial-[70%_80%] mask-radial-from-40% mask-radial-to-70% mask-radial-at-center animate-shiny-color-white/30 animate-shiny-duration-(--brain-animation-duration) dark:animate-shiny-color-white/20"></div>*/}
+        {/*    </div>*/}
+        {/*  </div>*/}
+        {/*</Tilt>*/}
         <Tilt scale={1.2}>
           {areParticlesLoaded && (
-            <div className={''}>
+            <div className={'relative'}>
               <Particles
                 id="tsparticles"
                 className={'h-42 w-40'}
@@ -71,7 +81,7 @@ const Header = ({ brainAnimationDuration, isDarkMode, ...navigationProps }: Head
               />
               {/* Flickering effect */}
               <div className="absolute inset-0 animate-visible-33-(--brain-animation-duration)">
-                <div className="h-full w-full animate-shiny mask-radial-[70%_80%] mask-radial-from-40% mask-radial-to-70% mask-radial-at-center animate-shiny-color-white/30 animate-shiny-duration-(--brain-animation-duration) dark:animate-shiny-color-white/20"></div>
+                <div className={shinyEffect}></div>
               </div>
             </div>
           )}
