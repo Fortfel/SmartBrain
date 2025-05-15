@@ -1,5 +1,9 @@
 import * as React from 'react'
 import { clsx } from 'clsx'
+import Particles, { initParticlesEngine } from '@tsparticles/react'
+import type { Container, ISourceOptions } from '@tsparticles/engine'
+import { loadSlim } from '@tsparticles/slim'
+import { particlesOoptionsLinks } from '@/assets/particlesOptions.ts'
 import { Header } from '@/componenets/Header.tsx'
 import { MainContent } from '@/componenets/MainContent.tsx'
 
@@ -14,31 +18,55 @@ const App = (): React.JSX.Element => {
       (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
     )
   })
+  const [areParticlesLoaded, setAreParticlesLoaded] = React.useState(false)
+
+  const particlesOptionsWithTheme: ISourceOptions = React.useMemo(() => {
+    return particlesOoptionsLinks
+  }, [isDarkMode])
 
   React.useEffect(() => {
     localStorage.setItem('theme', isDarkMode ? 'dark' : 'light')
     document.documentElement.dataset.theme = isDarkMode ? 'dark' : 'light'
   }, [isDarkMode])
 
+  React.useEffect(() => {
+    initParticlesEngine(async (engine) => {
+      // await loadAll(engine)
+      // await loadFull(engine)
+      await loadSlim(engine)
+      // await loadBasic(engine)
+    }).then(() => {
+      setAreParticlesLoaded(true)
+    })
+  }, [])
+
   function handleThemeChange() {
     setIsDarkMode(!isDarkMode)
   }
 
-  //todo clsx for hero-bacground-grid
+  const handleParticlesLoaded = async (container?: Container) => {
+    // console.log('Particles container loaded:', container)
+    container?.loadTheme(isDarkMode ? 'dark' : 'light')
+  }
+
   const heroBackgroundGrid = clsx('absolute inset-0 -z-10 bg-size-[50px_50px]', {
-    'bg-[linear-gradient(to_right,#80808034_1px,transparent_1px),linear-gradient(to_bottom,#80808034_1px,transparent_1px)]':
+    'bg-[linear-gradient(to_right,#8080801a_1px,transparent_1px),linear-gradient(to_bottom,#8080801a_1px,transparent_1px)]':
       isDarkMode,
     // 'bg-[linear-gradient(to_right,#80808034_1px,transparent_1px),linear-gradient(to_bottom,#80808034_1px,transparent_1px)]': !isDarkMode,
+    //#2a2a2a
 
     // 'mask-radial-[70%_70%] mask-radial-from-40% mask-radial-to-70% mask-radial-at-center': true,
     // mask
-    '': true,
+    'mask-t-to-[calc(100%-200px)]': true,
   })
 
   return (
     <>
-      <div className={heroBackgroundGrid}></div>
-      <div className={`relative flex flex-col gap-15 overflow-x-hidden`}>
+      {areParticlesLoaded && (
+        <Particles id="tsparticles-links" particlesLoaded={handleParticlesLoaded} options={particlesOptionsWithTheme} />
+      )}
+      <div className={`relative flex min-h-dvh flex-col gap-15 overflow-x-hidden`}>
+        <div className={heroBackgroundGrid}></div>
         <div className="hero-background"></div>
         <Header
           isLoggedIn={isLoggedIn}
