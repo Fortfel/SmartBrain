@@ -12,7 +12,7 @@
 
 /* dausyUI */
 @plugin "daisyui" {
-  themes: light --default, dark --prefersdark, synthwave;
+  themes: light, dark --prefersdark --default;
 }
 
 @theme {
@@ -23,32 +23,19 @@
   .hero-background {
     @apply absolute opacity-60 inset-0 -top-[100px] max-h-[1000px] -z-2 transition duration-500;
 
-    /*background: url('/src/assets/img/noise.png'), radial-gradient(circle at top center, #c4a5ff, #e0d5ff 25%, #d8e1ff, #eef5ff 65%, #f8fbff80);*/
-    /*mask-image: radial-gradient(ellipse 150% 35% at center center, #000 20%, #00000080 50%, #0000);*/
-
-
-    /*background: url('/src/assets/img/noise.png'), radial-gradient(circle at top center, #b894f6, #9f93e8 25%, #8da9f4, #7abeec 65%, #a8d8f280);*/
-    /*mask-image: radial-gradient(ellipse 200% 100% at top center, #000 20%, #00000080 50%, #0000), linear-gradient(to bottom, transparent 70px, #00000080 50%, #000);*/
-
-    /*background: url('/src/assets/img/noise.png'), radial-gradient(circle at top center, #b894f6, #9f93e8 25%, #8da9f4, #7abeec 65%, #a8d8f280);*/
-    /*mask-image: radial-gradient(ellipse 200% 100% at top center, #000 20%, #00000080 50%, #0000), linear-gradient(to bottom, transparent 70px, #00000080 50%, #000);*/
-
-    /*mask-image: radial-gradient(ellipse 200% 100% at top center, #000 20%, #00000080 50%, #0000),*/
-    /*linear-gradient(to bottom, transparent 70px, #00000080 50%, #000);*/
-
-    background:
-      url('/src/assets/img/noise.png'),
-      linear-gradient(to bottom, transparent, rgba(0,0,0,0.3)),
-      radial-gradient(circle at top center, #b894f6, #9f93e8 25%, #8da9f4, #7abeec 65%, #a8d8f280);
-    /*background-size: 100%;*/
+    background: url('/src/assets/img/noise.png'), radial-gradient(circle at top right, #b894f6, #9f93e8 25%, #8da9f4, #7abeec 65%, #a8d8f280);
+    mask-image: radial-gradient(ellipse 120% 40% at center 35%, #000 10%, #00000080 50%, #0000);
+    mask-composite: intersect;
 
     @variant dark {
       background: url('/src/assets/img/noise.png'), radial-gradient(circle at top center, #8e2de2, #563277 25%, #4a378c, #4066a8 65%, #32517380);
-      /*background-size: 100%;*/
       mask-image: radial-gradient(ellipse 150% 35% at center center, #000 20%, #00000080 50%, #0000);
     }
     @variant xl {
-      mask-image: radial-gradient(ellipse 80% 40% at center center, #000 20%, #00000080 50%, #0000);
+      mask-image: radial-gradient(ellipse 80% 50% at center 35%, #000 20%, #00000080 50%, #0000);
+      @variant dark {
+        mask-image: radial-gradient(ellipse 80% 40% at center center, #000 20%, #00000080 50%, #0000);
+      }
     }
   }
 }

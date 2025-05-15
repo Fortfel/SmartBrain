@@ -39,13 +39,27 @@ export const particlesOptionsPolygon = {
           color: {
             value: '#000',
           },
+          opacity: {
+            value: 0.6,
+          },
+          links: {
+            opacity: 0.6,
+          },
         },
         polygon: {
           draw: {
             stroke: {
               color: '#000',
-              opacity: 1,
+              opacity: 0.6,
               width: 2,
+            },
+          },
+        },
+        interactivity: {
+          modes: {
+            bubble: {
+              color: '#000',
+              opacity: 0.5,
             },
           },
         },
@@ -163,10 +177,36 @@ export const particlesOoptionsLinks = {
   style: {
     top: '72px',
   },
-  particles: {
-    color: {
-      value: '#ecf9ff',
+  themes: [
+    {
+      name: 'dark',
+      options: {
+        particles: {
+          color: {
+            value: '#ecf9ff',
+          },
+          links: {
+            opacity: 0.2,
+          },
+        },
+      },
     },
+    {
+      name: 'light',
+      options: {
+        particles: {
+          color: {
+            value: '#6495ED',
+          },
+          links: {
+            color: '#6495ED',
+            opacity: 0.3,
+          },
+        },
+      },
+    },
+  ],
+  particles: {
     number: {
       value: 100,
     },

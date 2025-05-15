@@ -43,7 +43,7 @@ const Header = ({ brainAnimationDuration, isDarkMode, ...navigationProps }: Head
     // mask
     'mask-radial-[70%_70%] mask-radial-from-40% mask-radial-to-70% mask-radial-at-center': true,
     // light/dark
-    'animate-shiny-color-white/30 dark:animate-shiny-color-white/20': true,
+    'animate-shiny-color-white/15 dark:animate-shiny-color-white/20': true,
   })
 
   return (

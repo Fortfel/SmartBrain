@@ -52,10 +52,9 @@ const App = (): React.JSX.Element => {
   const heroBackgroundGrid = clsx('absolute inset-0 -z-10 bg-size-[50px_50px]', {
     'bg-[linear-gradient(to_right,#8080801a_1px,transparent_1px),linear-gradient(to_bottom,#8080801a_1px,transparent_1px)]':
       isDarkMode,
-    // 'bg-[linear-gradient(to_right,#80808034_1px,transparent_1px),linear-gradient(to_bottom,#80808034_1px,transparent_1px)]': !isDarkMode,
-    //#2a2a2a
+    'bg-[linear-gradient(to_right,#8080801F_1px,transparent_1px),linear-gradient(to_bottom,#8080801F_1px,transparent_1px)]':
+      !isDarkMode,
 
-    // 'mask-radial-[70%_70%] mask-radial-from-40% mask-radial-to-70% mask-radial-at-center': true,
     // mask
     'mask-t-to-[calc(100%-200px)]': true,
   })
