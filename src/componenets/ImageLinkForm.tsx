@@ -1,6 +1,21 @@
 import * as React from 'react'
 
-const ImageLinkForm = (): React.JSX.Element => {
+type ImageLinkFormProps = {
+  inputValue: string
+  onInputChange: (event: React.ChangeEvent<HTMLInputElement>) => void
+  onButtonSubmit: (event: React.MouseEvent<HTMLButtonElement>) => void
+}
+
+const ImageLinkForm = ({ inputValue, onInputChange, onButtonSubmit }: ImageLinkFormProps): React.JSX.Element => {
+  const inputRef = React.useRef<HTMLInputElement>(null)
+
+  // Check validity before calling onButtonSubmit
+  const handleButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    if (inputRef.current && inputRef.current.validity.valid) {
+      onButtonSubmit(event)
+    }
+  }
+
   return (
     <section className={'mb-20 flex flex-col items-center gap-4'}>
       <p className={'text-center text-lg font-semibold'}>
@@ -16,17 +31,21 @@ const ImageLinkForm = (): React.JSX.Element => {
               </g>
             </svg>
             <input
+              ref={inputRef}
               type="url"
               required
               placeholder="https://"
-              // value="https://"
+              value={inputValue}
               pattern="^(https?://)?([a-zA-Z0-9]([a-zA-Z0-9\-].*[a-zA-Z0-9])?\.)+[a-zA-Z].*$"
               title="Must be valid URL"
+              onChange={onInputChange}
             />
           </label>
           <p className="validator-hint">Must be valid URL</p>
         </div>
-        <button className="btn join-item btn-lg btn-secondary">Detect</button>
+        <button className="btn join-item btn-lg btn-secondary" onClick={handleButtonClick}>
+          Detect
+        </button>
       </div>
     </section>
   )
