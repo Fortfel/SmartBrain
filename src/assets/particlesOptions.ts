@@ -196,11 +196,11 @@ export const particlesOoptionsLinks = {
       options: {
         particles: {
           color: {
-            value: '#6495ED',
+            value: '#888888',
           },
           links: {
-            color: '#6495ED',
-            opacity: 0.3,
+            color: '#888888',
+            opacity: 0.5,
           },
         },
       },
@@ -208,7 +208,7 @@ export const particlesOoptionsLinks = {
   ],
   particles: {
     number: {
-      value: 100,
+      value: 150,
     },
     links: {
       distance: 100,
@@ -243,7 +243,7 @@ export const particlesOoptionsLinks = {
       options: {
         particles: {
           number: {
-            value: 75,
+            value: 100,
           },
           links: {
             distance: 100,
@@ -256,7 +256,7 @@ export const particlesOoptionsLinks = {
       options: {
         particles: {
           number: {
-            value: 50,
+            value: 75,
           },
           links: {
             distance: 100,
