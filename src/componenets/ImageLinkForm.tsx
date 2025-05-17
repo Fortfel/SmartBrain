@@ -4,9 +4,15 @@ type ImageLinkFormProps = {
   inputValue: string
   onInputChange: (event: React.ChangeEvent<HTMLInputElement>) => void
   onButtonSubmit: (event: React.MouseEvent<HTMLButtonElement>) => void
+  isLoading: boolean
 }
 
-const ImageLinkForm = ({ inputValue, onInputChange, onButtonSubmit }: ImageLinkFormProps): React.JSX.Element => {
+const ImageLinkForm = ({
+  inputValue,
+  onInputChange,
+  onButtonSubmit,
+  isLoading,
+}: ImageLinkFormProps): React.JSX.Element => {
   const inputRef = React.useRef<HTMLInputElement>(null)
 
   // Check validity before calling onButtonSubmit
@@ -17,7 +23,7 @@ const ImageLinkForm = ({ inputValue, onInputChange, onButtonSubmit }: ImageLinkF
   }
 
   return (
-    <section className={'mb-20 flex flex-col items-center gap-4'}>
+    <section className={'flex flex-col items-center gap-4'}>
       <p className={'text-center text-lg font-semibold'}>
         This Magic Brain will detect faces in your pictures. Give it a try!
       </p>
@@ -43,8 +49,15 @@ const ImageLinkForm = ({ inputValue, onInputChange, onButtonSubmit }: ImageLinkF
           </label>
           <p className="validator-hint">Must be valid URL</p>
         </div>
-        <button className="btn join-item btn-lg btn-secondary" onClick={handleButtonClick}>
-          Detect
+        <button className="btn join-item btn-lg btn-secondary" onClick={handleButtonClick} disabled={isLoading}>
+          {isLoading ? (
+            <>
+              <span className="loading loading-sm loading-spinner"></span>
+              Detect
+            </>
+          ) : (
+            'Detect'
+          )}
         </button>
       </div>
     </section>

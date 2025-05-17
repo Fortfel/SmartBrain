@@ -2,28 +2,34 @@ import * as React from 'react'
 import { ImageLinkForm } from '@/componenets/ImageLinkForm.tsx'
 import { FaceRecognition } from '@/componenets/FaceRecognition.tsx'
 
+type ClarifaiRegion = {
+  data: {
+    concepts: Array<{
+      app_id: string
+      id: string
+      name: string
+      user_id: string
+      value: number
+    }>
+  }
+  region_info: {
+    bounding_box: {
+      top_row: number
+      right_col: number
+      bottom_row: number
+      left_col: number
+    }
+  }
+}
+
 type ClarifaiResponse = {
   outputs: Array<{
+    status: {
+      code: number
+      description: string
+    }
     data: {
-      regions: Array<{
-        data: {
-          concepts: Array<{
-            app_id: string
-            id: string
-            name: string
-            user_id: string
-            value: number
-          }>
-        }
-        region_info: {
-          bounding_box: {
-            top_row: number
-            right_col: number
-            bottom_row: number
-            left_col: number
-          }
-        }
-      }>
+      regions: Array<ClarifaiRegion>
     }
   }>
 }
@@ -35,50 +41,67 @@ type RequestOptionsArgs = {
   IMAGE_URL: string
 }
 
-async function fetchClarifaiData({ PAT, USER_ID, APP_ID, IMAGE_URL }: RequestOptionsArgs) {
-  /** @see https://cors-anywhere.herokuapp.com/ */
-  const CORS_PROXY = 'https://cors-anywhere.herokuapp.com/'
-  // Change these to whatever model and image URL you want to use
-  const MODEL_ID = 'face-detection'
+/** @see https://cors-anywhere.herokuapp.com/ */
+const CORS_PROXY = 'https://cors-anywhere.herokuapp.com/'
+// Change these to whatever model and image URL you want to use
+const MODEL_ID = 'face-detection'
 
+async function fetchClarifaiData({
+  PAT,
+  USER_ID,
+  APP_ID,
+  IMAGE_URL,
+}: RequestOptionsArgs): Promise<Array<ClarifaiRegion>> {
   const requestOptions = getRequestOptions({ PAT, USER_ID, APP_ID, IMAGE_URL })
 
-  try {
-    const response = await fetch(
-      (import.meta.env.DEV ? CORS_PROXY : '') + 'https://api.clarifai.com/v2/models/' + MODEL_ID + '/outputs',
-      requestOptions,
-    )
+  const response = await fetch(
+    (import.meta.env.DEV ? CORS_PROXY : '') + 'https://api.clarifai.com/v2/models/' + MODEL_ID + '/outputs',
+    requestOptions,
+  )
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status.toString()}`)
-    }
-
-    const result = (await response.json()) as ClarifaiResponse
-
-    console.log(result)
-    // Process the response data here
-
-    const regions = result.outputs[0].data.regions
-
-    regions.forEach((region) => {
-      // Accessing and rounding the bounding box values
-      const boundingBox = region.region_info.bounding_box
-      const topRow = boundingBox.top_row.toFixed(3)
-      const leftCol = boundingBox.left_col.toFixed(3)
-      const bottomRow = boundingBox.bottom_row.toFixed(3)
-      const rightCol = boundingBox.right_col.toFixed(3)
-
-      region.data.concepts.forEach((concept) => {
-        // Accessing and rounding the concept value
-        const name = concept.name
-        const value = concept.value.toFixed(4)
-
-        console.log(`${name}: ${value} BBox: ${topRow}, ${leftCol}, ${bottomRow}, ${rightCol}`)
-      })
-    })
-  } catch (error) {
-    console.log('error', error)
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status.toString()}`)
   }
+
+  const result = (await response.json()) as ClarifaiResponse
+
+  console.log(result)
+
+  // Check the status code from the API response
+  const statusCode = result.outputs?.[0]?.status?.code
+  const statusDescription = result.outputs?.[0]?.status?.description || 'Unknown error'
+
+  if (!statusCode) {
+    throw new Error('Invalid API response format')
+  }
+
+  // Status code 10000 is success according to Clarifai API
+  if (statusCode !== 10000) {
+    throw new Error(`API Error (${statusCode}): ${statusDescription}`)
+  }
+
+  if (!result.outputs?.[0]?.data?.regions) {
+    throw new Error('No face regions detected in the image')
+  }
+
+  return result.outputs[0].data.regions
+
+  // regions.forEach((region) => {
+  //   // Accessing and rounding the bounding box values
+  //   const boundingBox = region.region_info.bounding_box
+  //   const topRow = boundingBox.top_row.toFixed(3)
+  //   const leftCol = boundingBox.left_col.toFixed(3)
+  //   const bottomRow = boundingBox.bottom_row.toFixed(3)
+  //   const rightCol = boundingBox.right_col.toFixed(3)
+  //
+  //   region.data.concepts.forEach((concept) => {
+  //     // Accessing and rounding the concept value
+  //     const name = concept.name
+  //     const value = concept.value.toFixed(4)
+  //
+  //     console.log(`${name}: ${value} BBox: ${topRow}, ${leftCol}, ${bottomRow}, ${rightCol}`)
+  //   })
+  // })
 }
 
 function getRequestOptions({ PAT, USER_ID, APP_ID, IMAGE_URL }: RequestOptionsArgs) {
@@ -110,22 +133,40 @@ function getRequestOptions({ PAT, USER_ID, APP_ID, IMAGE_URL }: RequestOptionsAr
 }
 
 const MainContent = (): React.JSX.Element => {
-  // const [inputValue, setInputValue] = React.useState('https://')
   const [inputValue, setInputValue] = React.useState('https://samples.clarifai.com/metro-north.jpg')
+  const [imageUrl, setImageUrl] = React.useState('')
+  const [isLoading, setIsLoading] = React.useState(false)
+  const [errorMessage, setErrorMessage] = React.useState('')
+  const [faceRegions, setFaceRegions] = React.useState<Array<ClarifaiRegion>>([])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value)
   }
 
-  const handleButtonSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleButtonSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
 
-    void fetchClarifaiData({
-      PAT: import.meta.env.VITE_CLARIFAI_PAT,
-      USER_ID: import.meta.env.VITE_CLARIFAI_USER_I,
-      APP_ID: import.meta.env.VITE_CLARIFAI_APP_I,
-      IMAGE_URL: inputValue,
-    })
+    // Reset states
+    setErrorMessage('')
+    setIsLoading(true)
+    setImageUrl(inputValue)
+
+    try {
+      const regions = await fetchClarifaiData({
+        PAT: import.meta.env.VITE_CLARIFAI_PAT,
+        USER_ID: import.meta.env.VITE_CLARIFAI_USER_ID,
+        APP_ID: import.meta.env.VITE_CLARIFAI_APP_ID,
+        IMAGE_URL: inputValue, // We can't use imageUrl directly here because it's not yet updated (async)
+      })
+
+      setFaceRegions(regions)
+      console.log('Face regions detected:', regions)
+    } catch (error) {
+      console.error('Error fetching face data:', error)
+      setErrorMessage(error instanceof Error ? error.message : 'An unknown error occurred')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -136,8 +177,13 @@ const MainContent = (): React.JSX.Element => {
           <br />
           #5
         </p>
-        <ImageLinkForm inputValue={inputValue} onInputChange={handleInputChange} onButtonSubmit={handleButtonSubmit} />
-        <FaceRecognition />
+        <ImageLinkForm
+          inputValue={inputValue}
+          onInputChange={handleInputChange}
+          onButtonSubmit={handleButtonSubmit}
+          isLoading={isLoading}
+        />
+        <FaceRecognition imageUrl={imageUrl} errorMessage={errorMessage} />
         <img src="https://samples.clarifai.com/metro-north.jpg" alt="" />
       </div>
     </main>
