@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { ImageLinkForm } from '@/componenets/ImageLinkForm.tsx'
-import { FaceRecognition } from '@/componenets/FaceRecognition.tsx'
+import { FaceRecognition, type BoundingBox } from '@/componenets/FaceRecognition.tsx'
 
 type ClarifaiRegion = {
   data: {
@@ -20,6 +20,7 @@ type ClarifaiRegion = {
       left_col: number
     }
   }
+  value: number
 }
 
 type ClarifaiResponse = {
@@ -65,8 +66,6 @@ async function fetchClarifaiData({
 
   const result = (await response.json()) as ClarifaiResponse
 
-  console.log(result)
-
   // Check the status code from the API response
   const statusCode = result.outputs?.[0]?.status?.code
   const statusDescription = result.outputs?.[0]?.status?.description || 'Unknown error'
@@ -85,23 +84,6 @@ async function fetchClarifaiData({
   }
 
   return result.outputs[0].data.regions
-
-  // regions.forEach((region) => {
-  //   // Accessing and rounding the bounding box values
-  //   const boundingBox = region.region_info.bounding_box
-  //   const topRow = boundingBox.top_row.toFixed(3)
-  //   const leftCol = boundingBox.left_col.toFixed(3)
-  //   const bottomRow = boundingBox.bottom_row.toFixed(3)
-  //   const rightCol = boundingBox.right_col.toFixed(3)
-  //
-  //   region.data.concepts.forEach((concept) => {
-  //     // Accessing and rounding the concept value
-  //     const name = concept.name
-  //     const value = concept.value.toFixed(4)
-  //
-  //     console.log(`${name}: ${value} BBox: ${topRow}, ${leftCol}, ${bottomRow}, ${rightCol}`)
-  //   })
-  // })
 }
 
 function getRequestOptions({ PAT, USER_ID, APP_ID, IMAGE_URL }: RequestOptionsArgs) {
@@ -137,7 +119,7 @@ const MainContent = (): React.JSX.Element => {
   const [imageUrl, setImageUrl] = React.useState('')
   const [isLoading, setIsLoading] = React.useState(false)
   const [errorMessage, setErrorMessage] = React.useState('')
-  const [faceRegions, setFaceRegions] = React.useState<Array<ClarifaiRegion>>([])
+  const [faceRegions, setfaceRegions] = React.useState<Array<BoundingBox>>([])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value)
@@ -159,7 +141,26 @@ const MainContent = (): React.JSX.Element => {
         IMAGE_URL: inputValue, // We can't use imageUrl directly here because it's not yet updated (async)
       })
 
-      setFaceRegions(regions)
+      const boundingBoxes = regions.map((region) => {
+        // Accessing and rounding the bounding box values
+        const boundingBox = region.region_info.bounding_box
+        const topRow = boundingBox.top_row.toFixed(3)
+        const leftCol = boundingBox.left_col.toFixed(3)
+        const bottomRow = boundingBox.bottom_row.toFixed(3)
+        const rightCol = boundingBox.right_col.toFixed(3)
+        const value = region.value
+
+        return {
+          value,
+          topRow,
+          leftCol,
+          bottomRow,
+          rightCol,
+        }
+      })
+
+      setfaceRegions(boundingBoxes)
+
       console.log('Face regions detected:', regions)
     } catch (error) {
       console.error('Error fetching face data:', error)
@@ -183,8 +184,7 @@ const MainContent = (): React.JSX.Element => {
           onButtonSubmit={handleButtonSubmit}
           isLoading={isLoading}
         />
-        <FaceRecognition imageUrl={imageUrl} errorMessage={errorMessage} />
-        <img src="https://samples.clarifai.com/metro-north.jpg" alt="" />
+        <FaceRecognition imageUrl={imageUrl} errorMessage={errorMessage} faceRegions={faceRegions} />
       </div>
     </main>
   )
