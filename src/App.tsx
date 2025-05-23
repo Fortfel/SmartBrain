@@ -49,6 +49,10 @@ const App = (): React.JSX.Element => {
     container?.loadTheme(isDarkMode ? 'dark' : 'light')
   }
 
+  const handleLogIn = () => {
+    setIsLoggedIn(!isLoggedIn)
+  }
+
   const heroBackgroundGrid = clsx('absolute inset-0 -z-10 bg-size-[50px_50px]', {
     'bg-[linear-gradient(to_right,#8080801a_1px,transparent_1px),linear-gradient(to_bottom,#8080801a_1px,transparent_1px)]':
       isDarkMode,
@@ -72,6 +76,7 @@ const App = (): React.JSX.Element => {
           brainAnimationDuration={BRAIN_ANIMATION_DURATION}
           isDarkMode={isDarkMode}
           onThemeChange={handleThemeChange}
+          onLogIn={handleLogIn}
         />
         <MainContent />
       </div>
