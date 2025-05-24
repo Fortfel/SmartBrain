@@ -6,6 +6,7 @@ import { loadSlim } from '@tsparticles/slim'
 import { particlesOoptionsLinks } from '@/assets/particlesOptions.ts'
 import { Header } from '@/componenets/Header.tsx'
 import { MainContent } from '@/componenets/MainContent.tsx'
+import { SignIn } from '@/componenets/SignIn.tsx'
 
 // Configuration
 const BRAIN_ANIMATION_DURATION = 1.8 // in seconds
@@ -19,6 +20,7 @@ const App = (): React.JSX.Element => {
     )
   })
   const [areParticlesLoaded, setAreParticlesLoaded] = React.useState(false)
+  const loginDialogRef = React.useRef<HTMLDialogElement>(null!)
 
   const particlesOptionsWithTheme: ISourceOptions = React.useMemo(() => {
     return particlesOoptionsLinks
@@ -50,7 +52,8 @@ const App = (): React.JSX.Element => {
   }
 
   const handleLogIn = () => {
-    setIsLoggedIn(!isLoggedIn)
+    // setIsLoggedIn(!isLoggedIn)
+    loginDialogRef.current?.showModal()
   }
 
   const heroBackgroundGrid = clsx('absolute inset-0 -z-10 bg-size-[50px_50px]', {
@@ -79,6 +82,7 @@ const App = (): React.JSX.Element => {
           onLogIn={handleLogIn}
         />
         <MainContent />
+        <SignIn ref={loginDialogRef} />
       </div>
     </>
   )
