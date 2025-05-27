@@ -7,29 +7,19 @@ import { particlesOoptionsLinks } from '@/assets/particlesOptions.ts'
 import { Header } from '@/componenets/Header.tsx'
 import { MainContent } from '@/componenets/MainContent.tsx'
 import { SignIn } from '@/componenets/SignIn.tsx'
+import { useTheme } from '@/contexts/ThemeContext.tsx'
 
 // Configuration
 const BRAIN_ANIMATION_DURATION = 1.8 // in seconds
 
 const App = (): React.JSX.Element => {
   const [isLoggedIn, setIsLoggedIn] = React.useState(false)
-  const [isDarkMode, setIsDarkMode] = React.useState(() => {
-    return (
-      localStorage.theme === 'dark' ||
-      (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
-    )
-  })
+  const { theme, isDarkMode } = useTheme()
   const [areParticlesLoaded, setAreParticlesLoaded] = React.useState(false)
+
   const loginDialogRef = React.useRef<HTMLDialogElement>(null!)
 
-  const particlesOptionsWithTheme: ISourceOptions = React.useMemo(() => {
-    return particlesOoptionsLinks
-  }, [isDarkMode])
-
-  React.useEffect(() => {
-    localStorage.setItem('theme', isDarkMode ? 'dark' : 'light')
-    document.documentElement.dataset.theme = isDarkMode ? 'dark' : 'light'
-  }, [isDarkMode])
+  const particlesOptionsWithTheme: ISourceOptions = particlesOoptionsLinks
 
   React.useEffect(() => {
     initParticlesEngine(async (engine) => {
@@ -42,13 +32,9 @@ const App = (): React.JSX.Element => {
     })
   }, [])
 
-  function handleThemeChange() {
-    setIsDarkMode(!isDarkMode)
-  }
-
   const handleParticlesLoaded = async (container?: Container) => {
     // console.log('Particles container loaded:', container)
-    container?.loadTheme(isDarkMode ? 'dark' : 'light')
+    container?.loadTheme(theme)
   }
 
   const handleLogIn = () => {
@@ -74,13 +60,7 @@ const App = (): React.JSX.Element => {
       <div className={`relative flex min-h-dvh flex-col gap-15 overflow-x-hidden`}>
         <div className={heroBackgroundGrid}></div>
         <div className="hero-background"></div>
-        <Header
-          isLoggedIn={isLoggedIn}
-          brainAnimationDuration={BRAIN_ANIMATION_DURATION}
-          isDarkMode={isDarkMode}
-          onThemeChange={handleThemeChange}
-          onLogIn={handleLogIn}
-        />
+        <Header isLoggedIn={isLoggedIn} brainAnimationDuration={BRAIN_ANIMATION_DURATION} onLogIn={handleLogIn} />
         <MainContent />
         <SignIn ref={loginDialogRef} />
       </div>

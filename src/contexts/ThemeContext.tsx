@@ -27,10 +27,12 @@ const useTheme = (): ThemeContextType => {
 
 const ThemeProvider = ({ children, defaultTheme = 'light' }: ThemeProviderProps): React.JSX.Element => {
   const [theme, setTheme] = React.useState<ThemeType>(() => {
-    return localStorage.theme === 'dark' ||
-      (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
-      ? 'dark'
-      : defaultTheme
+    const savedTheme = localStorage.getItem('theme') as ThemeType
+    if (savedTheme && (savedTheme === 'light' || savedTheme === 'dark')) {
+      return savedTheme
+    } else {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : defaultTheme
+    }
   })
 
   React.useEffect(() => {

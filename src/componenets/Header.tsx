@@ -7,18 +7,17 @@ import { loadSlim } from '@tsparticles/slim'
 import { loadPolygonMaskPlugin } from '@tsparticles/plugin-polygon-mask'
 import { particlesOptionsPolygon } from '@/assets/particlesOptions.ts'
 import { Navigation, type NavigationProps } from '@/componenets/Navigation.tsx'
+import { useTheme } from '@/contexts/ThemeContext.tsx'
 
 type HeaderProps = {
   brainAnimationDuration: number
-  isDarkMode: boolean
 } & NavigationProps
 
-const Header = ({ brainAnimationDuration, isDarkMode, ...navigationProps }: HeaderProps): React.JSX.Element => {
+const Header = ({ brainAnimationDuration, ...navigationProps }: HeaderProps): React.JSX.Element => {
   const [areParticlesLoaded, setAreParticlesLoaded] = React.useState(false)
+  const { theme } = useTheme()
 
-  const particlesOptionsWithTheme: ISourceOptions = React.useMemo(() => {
-    return particlesOptionsPolygon
-  }, [isDarkMode])
+  const particlesOptionsWithTheme: ISourceOptions = particlesOptionsPolygon
 
   React.useEffect(() => {
     initParticlesEngine(async (engine) => {
@@ -34,7 +33,7 @@ const Header = ({ brainAnimationDuration, isDarkMode, ...navigationProps }: Head
 
   const handleParticlesLoaded = async (container?: Container) => {
     // console.log('Particles container loaded:', container)
-    container?.loadTheme(isDarkMode ? 'dark' : 'light')
+    container?.loadTheme(theme)
   }
 
   const shinyEffect = clsx('absolute inset-0', {
@@ -53,7 +52,7 @@ const Header = ({ brainAnimationDuration, isDarkMode, ...navigationProps }: Head
       style={{ '--brain-animation-duration': `${brainAnimationDuration}s` }}
     >
       <div className="mx-auto flex max-w-[var(--breakpoint-lg)] flex-col items-center gap-7">
-        <Navigation isDarkMode={isDarkMode} {...navigationProps} />
+        <Navigation {...navigationProps} />
         <Tilt scale={1.2}>
           {areParticlesLoaded && (
             <div className={'relative'}>

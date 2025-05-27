@@ -1,15 +1,13 @@
 import * as React from 'react'
+import { useTheme } from '@/contexts/ThemeContext.tsx'
 
-export type ThemeControllerProps = {
-  isDarkMode: boolean
-  onThemeChange: () => void
-}
+const ThemeController = (): React.JSX.Element => {
+  const { toggleTheme, isDarkMode } = useTheme()
 
-const ThemeController = ({ isDarkMode, onThemeChange }: ThemeControllerProps): React.JSX.Element => {
   return (
     <label className="swap swap-rotate">
       {/* this hidden checkbox controls the state */}
-      <input type="checkbox" checked={isDarkMode} onChange={onThemeChange} />
+      <input type="checkbox" checked={isDarkMode} onChange={toggleTheme} />
 
       {/* sun icon */}
       <svg className="swap-off size-8 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
