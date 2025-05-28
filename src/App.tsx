@@ -6,7 +6,7 @@ import { loadSlim } from '@tsparticles/slim'
 import { particlesOoptionsLinks } from '@/assets/particlesOptions.ts'
 import { Header } from '@/componenets/Header.tsx'
 import { MainContent } from '@/componenets/MainContent.tsx'
-import { SignIn } from '@/componenets/SignIn.tsx'
+import { SignIn } from '@/componenets/SignIn/SignIn.tsx'
 import { useTheme } from '@/contexts/ThemeContext.tsx'
 
 // Configuration
