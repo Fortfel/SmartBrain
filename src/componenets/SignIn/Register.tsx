@@ -4,6 +4,11 @@ const Register = (): React.JSX.Element => {
   return (
     <fieldset className="fieldset space-y-6">
       <div>
+        <label className="label text-sm/6 font-medium">Name</label>
+        <input type="name" className="input input-lg mt-2 w-full" placeholder="Name" />
+      </div>
+
+      <div>
         <label className="label text-sm/6 font-medium">Email</label>
         <input type="email" className="input input-lg mt-2 w-full" placeholder="Email" />
       </div>
