@@ -8,24 +8,42 @@ type SignInProps = {
 }
 
 const SignIn = ({ ref }: SignInProps): React.JSX.Element => {
+  const [route, setRoute] = React.useState('login')
+
+  const isLogin = route === 'login'
 
   return (
     <dialog id="my_modal" className="modal" ref={ref}>
       <div className="modal-box sm:p-10">
         <SvgBrain className="hidden size-8 w-full justify-center fill-current sm:flex" />
-        <h2 className="mt-10 text-center text-2xl/9 font-bold tracking-tight">Sign in to your account</h2>
+        <h2 className="mt-10 text-center text-2xl/9 font-bold tracking-tight">
+          Sign {isLogin ? 'In to your account' : 'Up'}
+        </h2>
 
         <div className="mt-10">
           <form method="dialog">
             <button className="btn absolute top-2 right-2 btn-circle btn-ghost btn-sm">✕</button>
             {isLogin ? <Login /> : <Register />}
           </form>
-          <p className="mt-10 text-center text-sm/6 text-base-content/50">
-            Don't have an account?{' '}
-            <a href="#" className="font-semibold text-primary">
-              Register
-            </a>
-          </p>
+
+          {isLogin ? (
+            <p className="mt-5 text-center text-sm/6 text-base-content/50">
+              Don't have an account?{' '}
+              <button
+                className="btn p-0 align-baseline font-semibold text-primary btn-link no-underline"
+                onClick={() => setRoute('register')}
+              >
+                Register
+              </button>
+            </p>
+          ) : (
+            <button
+              className="btn mt-5 p-0 align-baseline font-semibold text-primary btn-link no-underline"
+              onClick={() => setRoute('login')}
+            >
+              Back
+            </button>
+          )}
         </div>
       </div>
     </dialog>
