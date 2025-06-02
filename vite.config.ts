@@ -5,6 +5,8 @@ import tsconfigPaths from 'vite-tsconfig-paths'
 import legacy from '@vitejs/plugin-legacy'
 import VitePluginBrowserSync from 'vite-plugin-browser-sync'
 
+const serverPort = process.env.PORT || 3000
+
 // https://vite.dev/config/
 // eslint-disable-next-line import/no-default-export
 export default defineConfig({
@@ -17,4 +19,14 @@ export default defineConfig({
     }),
     VitePluginBrowserSync(),
   ],
+  server: {
+    proxy: {
+      // Proxy API requests to the Express server during development
+      '/api': {
+        target: `http://localhost:${serverPort}`,
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
 })

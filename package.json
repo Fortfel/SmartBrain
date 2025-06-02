@@ -8,14 +8,17 @@
   "type": "module",
   "scripts": {
     "vite": "vite",
-    "dev": "npm-run-all --parallel watch:tsc vite",
+    "dev": "npm-run-all --parallel watch:tsc vite server:dev",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "watch:tsc": "tsc --noEmit --watch",
     "lint": "eslint ./src/**/*.{ts,tsx}",
     "lint:fix": "eslint ./src/**/*.{ts,tsx} --fix",
     "docs": "typedoc",
-    "watch:docs": "typedoc --watch"
+    "watch:docs": "typedoc --watch",
+    "server:dev": "node --watch server/server.js",
+    "server": "node server/server.js",
+    "start": "NODE_ENV=production node server/server.js"
   },
   "dependencies": {
     "@tsparticles/engine": "^3.8.1",
