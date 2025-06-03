@@ -1,9 +1,18 @@
+import fs from 'node:fs'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react-swc'
 import tailwindcss from '@tailwindcss/vite'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import legacy from '@vitejs/plugin-legacy'
 import VitePluginBrowserSync from 'vite-plugin-browser-sync'
+
+// Load environment variables
+if (fs.existsSync('.env.local')) {
+  process.loadEnvFile('.env.local')
+}
+if (fs.existsSync('.env')) {
+  process.loadEnvFile('.env')
+}
 
 const serverPort = process.env.PORT || 3000
 

@@ -17,7 +17,7 @@ A modern starter template for React applications with TypeScript, Tailwind CSS, 
 
 ### Prerequisites
 
-- Node.js (v18 or newer)
+- Node.js (v21 or newer)
 - npm or yarn
 
 ### Installation

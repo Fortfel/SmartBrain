@@ -1,6 +1,15 @@
 import express from 'express'
-import path from 'path'
-import { fileURLToPath } from 'url'
+import path from 'node:path'
+import fs from 'node:fs'
+import { fileURLToPath } from 'node:url'
+
+// Load environment variables
+if (fs.existsSync('.env.local')) {
+  process.loadEnvFile('.env.local')
+}
+if (fs.existsSync('.env')) {
+  process.loadEnvFile('.env')
+}
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
