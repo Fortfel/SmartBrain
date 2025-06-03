@@ -24,6 +24,7 @@
     "@tsparticles/plugin-polygon-mask": "^3.8.1",
     "@tsparticles/react": "^3.0.0",
     "@tsparticles/slim": "^3.8.1",
+    "argon2": "^0.43.0",
     "clsx": "^2.1.1",
     "express": "^5.1.0",
     "react": "^19.1.0",
