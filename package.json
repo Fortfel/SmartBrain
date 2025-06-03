@@ -17,8 +17,7 @@
     "docs": "typedoc",
     "watch:docs": "typedoc --watch",
     "server:dev": "node --watch server/server.js",
-    "server": "node server/server.js",
-    "start": "NODE_ENV=production node server/server.js"
+    "start": "node server/server.js"
   },
   "dependencies": {
     "@tsparticles/engine": "^3.8.1",
