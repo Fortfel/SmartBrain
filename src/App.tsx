@@ -37,7 +37,7 @@ const App = (): React.JSX.Element => {
     container?.loadTheme(theme)
   }
 
-  const handleLogIn = () => {
+  const handleSignInClick = () => {
     // setIsLoggedIn(!isLoggedIn)
     loginDialogRef.current?.showModal()
   }
@@ -60,7 +60,11 @@ const App = (): React.JSX.Element => {
       <div className={`relative flex min-h-dvh flex-col gap-15 overflow-x-hidden`}>
         <div className={heroBackgroundGrid}></div>
         <div className="hero-background"></div>
-        <Header isLoggedIn={isLoggedIn} brainAnimationDuration={BRAIN_ANIMATION_DURATION} onLogIn={handleLogIn} />
+        <Header
+          isLoggedIn={isLoggedIn}
+          brainAnimationDuration={BRAIN_ANIMATION_DURATION}
+          onSignInClick={handleSignInClick}
+        />
         <MainContent />
         <SignIn ref={loginDialogRef} />
       </div>
