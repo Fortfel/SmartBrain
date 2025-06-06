@@ -14,8 +14,8 @@ const BRAIN_ANIMATION_DURATION = 1.8 // in seconds
 
 const App = (): React.JSX.Element => {
   const [isLoggedIn, setIsLoggedIn] = React.useState(false)
-  const { theme, isDarkMode } = useTheme()
   const [areParticlesLoaded, setAreParticlesLoaded] = React.useState(false)
+  const { theme, isDarkMode } = useTheme()
 
   const loginDialogRef = React.useRef<HTMLDialogElement>(null!)
 
