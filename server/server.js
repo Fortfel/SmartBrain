@@ -121,7 +121,7 @@ app.post('/api/register', async (req, res) => {
     users.push(user)
 
     // Don't send the password back to the client
-    const { password, ...userWithoutPassword } = user
+    const { password: _, ...userWithoutPassword } = user
     res.json(userWithoutPassword)
   } catch (err) {
     console.error('Password hashing error:', err)

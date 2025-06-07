@@ -1,11 +1,11 @@
 import * as React from 'react'
 import { type LoginResponse, useAuth } from '@/contexts/AuthContext.tsx'
 
-type SignInProps = {
+type LoginProps = {
   onSuccess: () => void
 }
 
-const Login = ({ onSuccess }: SignInProps): React.JSX.Element => {
+const Login = ({ onSuccess }: LoginProps): React.JSX.Element => {
   const [_formState, formAction, isPending] = React.useActionState<LoginResponse | null, FormData>(handleLogin, null)
   const { login } = useAuth()
 
