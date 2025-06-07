@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { ImageLinkForm } from '@/componenets/ImageLinkForm.tsx'
 import { FaceRecognition, type BoundingBox } from '@/componenets/FaceRecognition.tsx'
+import { useAuth } from '@/contexts/AuthContext.tsx'
 
 type ClarifaiRegion = {
   data: {
@@ -120,12 +121,17 @@ const MainContent = (): React.JSX.Element => {
   const [isLoading, setIsLoading] = React.useState(false)
   const [errorMessage, setErrorMessage] = React.useState('')
   const [faceRegions, setfaceRegions] = React.useState<Array<BoundingBox>>([])
+  const { user } = useAuth()
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value)
   }
 
   const handleButtonSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (!user) {
+      setErrorMessage('Please sign in to use this feature')
+      return
+    }
     e.preventDefault()
 
     // Reset states
@@ -173,11 +179,15 @@ const MainContent = (): React.JSX.Element => {
   return (
     <main className="min-h-[600px] px-5 font-courier">
       <div className="mx-auto flex max-w-[var(--breakpoint-lg)] flex-col items-center gap-7">
-        <p className={'text-center text-lg font-semibold'}>
-          Fortel, your current rank is...
-          <br />
-          #5
-        </p>
+        {user && (
+          <p className="text-center text-lg font-semibold">
+            <span className="text-secondary">{user.name}</span>, you used face recognition tool
+            <br />
+            <span className="text-secondary">{user.entries}</span> times total
+            <br />
+            and <span className="text-secondary">0/10</span> this month
+          </p>
+        )}
         <ImageLinkForm
           inputValue={inputValue}
           onInputChange={handleInputChange}

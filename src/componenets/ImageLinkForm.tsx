@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useAuth } from '@/contexts/AuthContext.tsx'
 
 type ImageLinkFormProps = {
   inputValue: string
@@ -13,6 +14,8 @@ const ImageLinkForm = ({
   onButtonSubmit,
   isLoading,
 }: ImageLinkFormProps): React.JSX.Element => {
+  const { user } = useAuth()
+
   const inputRef = React.useRef<HTMLInputElement>(null)
 
   // Check validity before calling onButtonSubmit
@@ -49,7 +52,11 @@ const ImageLinkForm = ({
           </label>
           <p className="validator-hint">Must be valid URL</p>
         </div>
-        <button className="btn join-item btn-lg btn-secondary" onClick={handleButtonClick} disabled={isLoading}>
+        <button
+          className="btn join-item btn-lg btn-secondary"
+          onClick={handleButtonClick}
+          disabled={isLoading || !user}
+        >
           {isLoading ? (
             <>
               <span className="loading loading-sm loading-spinner"></span>
