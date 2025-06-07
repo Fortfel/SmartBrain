@@ -8,14 +8,15 @@ import { Header } from '@/componenets/Header.tsx'
 import { MainContent } from '@/componenets/MainContent.tsx'
 import { SignIn } from '@/componenets/SignIn/SignIn.tsx'
 import { useTheme } from '@/contexts/ThemeContext.tsx'
+import { useAuth } from '@/contexts/AuthContext.tsx'
 
 // Configuration
 const BRAIN_ANIMATION_DURATION = 1.8 // in seconds
 
 const App = (): React.JSX.Element => {
-  const [isLoggedIn, setIsLoggedIn] = React.useState(false)
   const [areParticlesLoaded, setAreParticlesLoaded] = React.useState(false)
   const { theme, isDarkMode } = useTheme()
+  const { user, logout } = useAuth()
 
   const loginDialogRef = React.useRef<HTMLDialogElement>(null!)
 
@@ -38,8 +39,11 @@ const App = (): React.JSX.Element => {
   }
 
   const handleSignInClick = () => {
-    // setIsLoggedIn(!isLoggedIn)
-    loginDialogRef.current?.showModal()
+    if (user) {
+      logout()
+    } else {
+      loginDialogRef.current?.showModal()
+    }
   }
 
   const heroBackgroundGrid = clsx('absolute inset-0 -z-10 bg-size-[50px_50px]', {
@@ -60,11 +64,7 @@ const App = (): React.JSX.Element => {
       <div className={`relative flex min-h-dvh flex-col gap-15 overflow-x-hidden`}>
         <div className={heroBackgroundGrid}></div>
         <div className="hero-background"></div>
-        <Header
-          isLoggedIn={isLoggedIn}
-          brainAnimationDuration={BRAIN_ANIMATION_DURATION}
-          onSignInClick={handleSignInClick}
-        />
+        <Header brainAnimationDuration={BRAIN_ANIMATION_DURATION} onSignInClick={handleSignInClick} />
         <MainContent />
         <SignIn ref={loginDialogRef} />
       </div>

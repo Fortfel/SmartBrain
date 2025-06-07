@@ -1,6 +1,7 @@
 import * as React from 'react'
 
 import placeholder from '@/assets/img/placeholder.png'
+import { useAuth } from '@/contexts/AuthContext.tsx'
 
 export type BoundingBox = {
   value: number
@@ -17,6 +18,8 @@ type FaceRecognitionProps = {
 }
 
 const FaceRecognition = ({ imageUrl, errorMessage, faceRegions }: FaceRecognitionProps): React.JSX.Element => {
+  const { user } = useAuth()
+
   return (
     <div className="flex w-full flex-col items-center">
       {errorMessage.length > 0 && (
@@ -85,12 +88,28 @@ const FaceRecognition = ({ imageUrl, errorMessage, faceRegions }: FaceRecognitio
                 d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
               ></path>
             </svg>
-            <span>
-              Enter an image URL and click Detect to find faces.
-              <br />
-              You have to be <strong>logged in</strong> to use this feature.
-            </span>
+            <span>Enter an image URL and click Detect to find faces.</span>
           </div>
+          {!user && (
+            <div className="alert-soft mt-2 alert w-full max-w-lg alert-info">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                className="h-6 w-6 shrink-0 stroke-current"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                ></path>
+              </svg>
+              <span>
+                You have to be <strong>logged in</strong> to use this feature.
+              </span>
+            </div>
+          )}
           <img src={placeholder} alt="face recognition result" className="mt-5 w-full max-w-lg" />
         </>
       )}
