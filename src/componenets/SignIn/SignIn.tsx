@@ -10,7 +10,7 @@ type SignInProps = {
 
 const SignIn = ({ ref }: SignInProps): React.JSX.Element => {
   const [route, setRoute] = React.useState('login')
-  const { error } = useAuth()
+  const { error, setError } = useAuth()
 
   const isLoginRoute = route === 'login'
 
@@ -19,7 +19,16 @@ const SignIn = ({ ref }: SignInProps): React.JSX.Element => {
   }
 
   return (
-    <dialog id="my_modal" className="modal" ref={ref}>
+    <dialog
+      id="my_modal"
+      className="modal"
+      ref={ref}
+      onTransitionEnd={(e) => {
+        if (e.target === ref.current && !ref.current.open) {
+          setRoute('login')
+        }
+      }}
+    >
       <div className="modal-box sm:p-10">
         <SvgBrain className="hidden size-8 w-full justify-center fill-current sm:flex" />
         <button className="btn absolute top-2 right-2 btn-circle btn-ghost btn-sm" onClick={closeModal}>
@@ -41,7 +50,10 @@ const SignIn = ({ ref }: SignInProps): React.JSX.Element => {
               Don't have an account?{' '}
               <button
                 className="btn p-0 align-baseline font-semibold text-primary btn-link no-underline"
-                onClick={() => setRoute('register')}
+                onClick={() => {
+                  setRoute('register')
+                  setError('')
+                }}
               >
                 Register
               </button>
@@ -49,7 +61,10 @@ const SignIn = ({ ref }: SignInProps): React.JSX.Element => {
           ) : (
             <button
               className="btn mt-5 p-0 align-baseline font-semibold text-primary btn-link no-underline"
-              onClick={() => setRoute('login')}
+              onClick={() => {
+                setRoute('login')
+                setError('')
+              }}
             >
               Back
             </button>

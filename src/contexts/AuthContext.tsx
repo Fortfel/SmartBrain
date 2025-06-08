@@ -17,6 +17,7 @@ type AuthContextType = {
   setUser: React.Dispatch<React.SetStateAction<User | null>>
   isLoading: boolean
   error: string | null
+  setError: React.Dispatch<React.SetStateAction<string | null>>
   login: (request: LoginRequest) => Promise<LoginResponse>
   register: (request: RegisterRequest) => Promise<RegisterResponse>
   logout: () => void
@@ -163,6 +164,7 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
       setUser,
       isLoading,
       error,
+      setError,
       login,
       register,
       logout,
