@@ -4,24 +4,24 @@ import { useAuth } from '@/contexts/AuthContext.tsx'
 type ImageLinkFormProps = {
   inputValue: string
   onInputChange: (event: React.ChangeEvent<HTMLInputElement>) => void
-  onButtonSubmit: (event: React.MouseEvent<HTMLButtonElement>) => void
+  onPictureSubmit: (event: React.MouseEvent<HTMLButtonElement>) => void
   isLoading: boolean
 }
 
 const ImageLinkForm = ({
   inputValue,
   onInputChange,
-  onButtonSubmit,
+  onPictureSubmit,
   isLoading,
 }: ImageLinkFormProps): React.JSX.Element => {
   const { user } = useAuth()
 
   const inputRef = React.useRef<HTMLInputElement>(null)
 
-  // Check validity before calling onButtonSubmit
+  // Check validity before calling onPictureSubmit
   const handleButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     if (inputRef.current && inputRef.current.validity.valid) {
-      onButtonSubmit(event)
+      onPictureSubmit(event)
     }
   }
 

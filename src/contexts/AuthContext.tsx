@@ -73,7 +73,7 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
       })
 
       if (!response.ok) {
-        const errrorData = (await response.json()) as ErrorResponse
+        const errrorData: ErrorResponse = await response.json()
         setError(errrorData.error || 'Login failed')
 
         return {

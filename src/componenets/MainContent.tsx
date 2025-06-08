@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { ImageLinkForm } from '@/componenets/ImageLinkForm.tsx'
-import { FaceRecognition, type BoundingBox } from '@/componenets/FaceRecognition.tsx'
+import { type BoundingBox, FaceRecognition } from '@/componenets/FaceRecognition.tsx'
 import { useAuth } from '@/contexts/AuthContext.tsx'
 
 type ClarifaiRegion = {
@@ -65,7 +65,7 @@ async function fetchClarifaiData({
     throw new Error(`HTTP error! status: ${response.status.toString()}`)
   }
 
-  const result = (await response.json()) as ClarifaiResponse
+  const result: ClarifaiResponse = await response.json()
 
   // Check the status code from the API response
   const statusCode = result.outputs?.[0]?.status?.code
@@ -127,7 +127,7 @@ const MainContent = (): React.JSX.Element => {
     setInputValue(e.target.value)
   }
 
-  const handleButtonSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handlePictureSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     if (!user) {
       setErrorMessage('Please sign in to use this feature')
       return
@@ -191,7 +191,7 @@ const MainContent = (): React.JSX.Element => {
         <ImageLinkForm
           inputValue={inputValue}
           onInputChange={handleInputChange}
-          onButtonSubmit={handleButtonSubmit}
+          onPictureSubmit={handlePictureSubmit}
           isLoading={isLoading}
         />
         <FaceRecognition imageUrl={imageUrl} errorMessage={errorMessage} faceRegions={faceRegions} />
