@@ -13,6 +13,8 @@ import { useAuth } from '@/contexts/AuthContext.tsx'
 // Configuration
 const BRAIN_ANIMATION_DURATION = 1.8 // in seconds
 
+const MemoizedParticles = React.memo(Particles)
+
 const App = (): React.JSX.Element => {
   const [areParticlesLoaded, setAreParticlesLoaded] = React.useState(false)
   const { theme, isDarkMode } = useTheme()
@@ -33,10 +35,12 @@ const App = (): React.JSX.Element => {
     })
   }, [])
 
-  const handleParticlesLoaded = async (container?: Container) => {
-    // console.log('Particles container loaded:', container)
-    container?.loadTheme(theme)
-  }
+  const handleParticlesLoaded = React.useCallback(
+    async (container?: Container) => {
+      container?.loadTheme(theme)
+    },
+    [theme],
+  )
 
   const handleSignInClick = () => {
     if (user) {
@@ -59,7 +63,11 @@ const App = (): React.JSX.Element => {
   return (
     <>
       {areParticlesLoaded && (
-        <Particles id="tsparticles-links" particlesLoaded={handleParticlesLoaded} options={particlesOptionsWithTheme} />
+        <MemoizedParticles
+          id="tsparticles-links"
+          particlesLoaded={handleParticlesLoaded}
+          options={particlesOptionsWithTheme}
+        />
       )}
       <div className={`relative flex min-h-dvh flex-col gap-15 overflow-x-hidden`}>
         <div className={heroBackgroundGrid}></div>

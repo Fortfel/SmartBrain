@@ -13,6 +13,8 @@ type HeaderProps = {
   brainAnimationDuration: number
 } & NavigationProps
 
+const MemoizedParticles = React.memo(Particles)
+
 const Header = ({ brainAnimationDuration, ...navigationProps }: HeaderProps): React.JSX.Element => {
   const [areParticlesLoaded, setAreParticlesLoaded] = React.useState(false)
   const { theme } = useTheme()
@@ -31,10 +33,12 @@ const Header = ({ brainAnimationDuration, ...navigationProps }: HeaderProps): Re
     })
   }, [])
 
-  const handleParticlesLoaded = async (container?: Container) => {
-    // console.log('Particles container loaded:', container)
-    container?.loadTheme(theme)
-  }
+  const handleParticlesLoaded = React.useCallback(
+    async (container?: Container) => {
+      container?.loadTheme(theme)
+    },
+    [theme],
+  )
 
   const shinyEffect = clsx('absolute inset-0', {
     // animation
@@ -56,7 +60,7 @@ const Header = ({ brainAnimationDuration, ...navigationProps }: HeaderProps): Re
         <Tilt scale={1.2}>
           {areParticlesLoaded && (
             <div className={'relative'}>
-              <Particles
+              <MemoizedParticles
                 id="tsparticles-polygon"
                 className={'h-42 w-40'}
                 particlesLoaded={handleParticlesLoaded}
