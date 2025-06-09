@@ -4,11 +4,13 @@ import { User, LoginRequest, RegisterRequest, ErrorResponse } from '@/types/api-
 
 type LoginResponse = {
   success: boolean
+  error?: string
   user?: User
 }
 
 type RegisterResponse = {
   success: boolean
+  error?: string
   user?: User
 }
 
@@ -16,8 +18,6 @@ type AuthContextType = {
   user: User | null
   setUser: React.Dispatch<React.SetStateAction<User | null>>
   isLoading: boolean
-  error: string | null
-  setError: React.Dispatch<React.SetStateAction<string | null>>
   login: (request: LoginRequest) => Promise<LoginResponse>
   register: (request: RegisterRequest) => Promise<RegisterResponse>
   logout: () => void
@@ -40,7 +40,6 @@ const useAuth = (): AuthContextType => {
 const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
   const [user, setUser] = React.useState<User | null>(null)
   const [isLoading, setIsLoading] = React.useState<boolean>(true)
-  const [error, setError] = React.useState<string | null>(null)
 
   // Initialize auth state (check for existing session)
   React.useEffect(() => {
@@ -62,7 +61,6 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
   const login = React.useCallback(async ({ email, password }: LoginRequest): Promise<LoginResponse> => {
     try {
       setIsLoading(true)
-      setError(null)
 
       const response = await fetch('/api/login', {
         method: 'POST',
@@ -74,14 +72,14 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
 
       if (!response.ok) {
         const errrorData: ErrorResponse = await response.json()
-        setError(errrorData.error || 'Login failed')
 
         return {
           success: false,
+          error: errrorData.error || 'Login failed',
         } satisfies LoginResponse
       }
 
-      const userData = (await response.json()) as User
+      const userData: User = await response.json()
 
       // save user data to session storage
       sessionStorage.setItem('smart-brain-user', JSON.stringify(userData))
@@ -94,10 +92,10 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
       } satisfies LoginResponse
     } catch (error) {
       console.error('Login failed:', error)
-      setError(error instanceof Error ? error.message : 'Login failed')
 
       return {
         success: false,
+        error: error instanceof Error ? error.message : 'Login failed',
       } satisfies LoginResponse
     } finally {
       setIsLoading(false)
@@ -107,7 +105,6 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
   const register = React.useCallback(async ({ name, email, password }: RegisterRequest): Promise<RegisterResponse> => {
     try {
       setIsLoading(true)
-      setError(null)
 
       const response = await fetch('/api/register', {
         method: 'POST',
@@ -118,15 +115,15 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
       })
 
       if (!response.ok) {
-        const errrorData = (await response.json()) as ErrorResponse
-        setError(errrorData.error || 'Registration failed')
+        const errrorData: ErrorResponse = await response.json()
 
         return {
           success: false,
+          error: errrorData.error || 'Registration failed',
         } satisfies RegisterResponse
       }
 
-      const userData = (await response.json()) as User
+      const userData: User = await response.json()
 
       // save user data to session storage
       sessionStorage.setItem('smart-brain-user', JSON.stringify(userData))
@@ -139,10 +136,10 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
       } satisfies RegisterResponse
     } catch (error) {
       console.error('Registration failed:', error)
-      setError(error instanceof Error ? error.message : 'Registration failed')
 
       return {
         success: false,
+        error: error instanceof Error ? error.message : 'Registration failed',
       } satisfies RegisterResponse
     } finally {
       setIsLoading(false)
@@ -154,7 +151,6 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
     sessionStorage.removeItem('smart-brain-user')
 
     setUser(null)
-    setError(null)
   }, [])
 
   // Memoize the context value to prevent unnecessary re-renders
@@ -163,13 +159,11 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
       user,
       setUser,
       isLoading,
-      error,
-      setError,
       login,
       register,
       logout,
     }),
-    [user, isLoading, error, login, register, logout],
+    [user, isLoading, login, register, logout],
   )
 
   return <AuthContext value={contextValue}>{children}</AuthContext>

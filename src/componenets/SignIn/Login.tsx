@@ -6,7 +6,8 @@ type LoginProps = {
 }
 
 const Login = ({ onSuccess }: LoginProps): React.JSX.Element => {
-  const [_formState, formAction, isPending] = React.useActionState<LoginResponse | null, FormData>(handleLogin, null)
+  const [formState, formAction, isPending] = React.useActionState<LoginResponse | null, FormData>(handleLogin, null)
+  const [email, setEmail] = React.useState('')
   const { login } = useAuth()
 
   async function handleLogin(_prevState: LoginResponse | null, formData: FormData): Promise<LoginResponse> {
@@ -18,50 +19,54 @@ const Login = ({ onSuccess }: LoginProps): React.JSX.Element => {
       onSuccess()
     }
 
-    console.log(response)
     return response
   }
 
   return (
-    <form action={formAction}>
-      <fieldset className="fieldset space-y-1">
-        <div>
-          <label className="label text-sm/6 font-medium">Email</label>
-          <input
-            type="email"
-            name="email"
-            className="validator input input-lg mt-2 w-full"
-            placeholder="Email"
-            required
-          />
-          <p className="validator-hint">Enter valid email address</p>
-        </div>
+    <>
+      {formState && formState.error && <div className="mb-2 alert alert-error">{formState.error}</div>}
+      <form action={formAction}>
+        <fieldset className="fieldset space-y-1">
+          <div>
+            <label className="label text-sm/6 font-medium">Email</label>
+            <input
+              type="email"
+              name="email"
+              className="validator input input-lg mt-2 w-full"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+            <p className="validator-hint">Enter valid email address</p>
+          </div>
 
-        <div>
-          <label className="label text-sm/6 font-medium">Password</label>
-          <input
-            type="password"
-            name="password"
-            className="validator input input-lg mt-2 w-full"
-            placeholder="Password"
-            required
-            minLength={5}
-          />
-          <p className="validator-hint">Must be more than 4 characters</p>
-        </div>
+          <div>
+            <label className="label text-sm/6 font-medium">Password</label>
+            <input
+              type="password"
+              name="password"
+              className="validator input input-lg mt-2 w-full"
+              placeholder="Password"
+              required
+              minLength={5}
+            />
+            <p className="validator-hint">Must be more than 4 characters</p>
+          </div>
 
-        <button className="btn text-sm/6 font-semibold btn-primary" type="submit" disabled={isPending}>
-          {isPending ? (
-            <>
-              <span className="loading loading-sm loading-spinner"></span>
-              Signing in...
-            </>
-          ) : (
-            'Sign In'
-          )}
-        </button>
-      </fieldset>
-    </form>
+          <button className="btn text-sm/6 font-semibold btn-primary" type="submit" disabled={isPending}>
+            {isPending ? (
+              <>
+                <span className="loading loading-sm loading-spinner"></span>
+                Signing in...
+              </>
+            ) : (
+              'Sign In'
+            )}
+          </button>
+        </fieldset>
+      </form>
+    </>
   )
 }
 
