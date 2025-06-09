@@ -14,6 +14,12 @@ type RegisterResponse = {
   user?: User
 }
 
+type ImageEntryResponse = {
+  success: boolean
+  error?: string
+  user?: User
+}
+
 type AuthContextType = {
   user: User | null
   setUser: React.Dispatch<React.SetStateAction<User | null>>
@@ -21,6 +27,7 @@ type AuthContextType = {
   login: (request: LoginRequest) => Promise<LoginResponse>
   register: (request: RegisterRequest) => Promise<RegisterResponse>
   logout: () => void
+  updateUserEntries: (userId: number) => Promise<ImageEntryResponse>
 }
 
 type AuthProviderProps = {
@@ -153,6 +160,48 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
     setUser(null)
   }, [])
 
+  const updateUserEntries = React.useCallback(async (userId: number): Promise<ImageEntryResponse> => {
+    try {
+      const response = await fetch('/api/image', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: userId,
+        }),
+      })
+
+      if (!response.ok) {
+        const errrorData: ErrorResponse = await response.json()
+
+        return {
+          success: false,
+          error: errrorData.error || 'Failed to update user entries',
+        } satisfies ImageEntryResponse
+      }
+
+      const userData: User = await response.json()
+
+      // save user data to session storage
+      sessionStorage.setItem('smart-brain-user', JSON.stringify(userData))
+
+      setUser(userData)
+
+      return {
+        success: true,
+        user: userData,
+      } satisfies ImageEntryResponse
+    } catch (error) {
+      console.error('Failed to update user entries:', error)
+
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to update user entries',
+      } satisfies ImageEntryResponse
+    }
+  }, [])
+
   // Memoize the context value to prevent unnecessary re-renders
   const contextValue = React.useMemo(
     () => ({
@@ -162,8 +211,9 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
       login,
       register,
       logout,
+      updateUserEntries,
     }),
-    [user, isLoading, login, register, logout],
+    [user, isLoading, login, register, logout, updateUserEntries],
   )
 
   return <AuthContext value={contextValue}>{children}</AuthContext>

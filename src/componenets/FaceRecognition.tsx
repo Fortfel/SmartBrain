@@ -43,7 +43,7 @@ const FaceRecognition = ({ imageUrl, errorMessage, faceRegions }: FaceRecognitio
         </div>
       )}
       {imageUrl && (
-        <div className="relative">
+        <div className="relative mb-5">
           <img src={imageUrl} alt="face recognition result" className="w-full max-w-lg" />
           {faceRegions.length > 0 && (
             <div className="absolute inset-0">

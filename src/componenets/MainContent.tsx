@@ -121,7 +121,7 @@ const MainContent = (): React.JSX.Element => {
   const [isLoading, setIsLoading] = React.useState(false)
   const [errorMessage, setErrorMessage] = React.useState('')
   const [faceRegions, setfaceRegions] = React.useState<Array<BoundingBox>>([])
-  const { user } = useAuth()
+  const { user, updateUserEntries } = useAuth()
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value)
@@ -146,6 +146,14 @@ const MainContent = (): React.JSX.Element => {
         APP_ID: import.meta.env.VITE_CLARIFAI_APP_ID,
         IMAGE_URL: inputValue, // We can't use imageUrl directly here because it's not yet updated (async)
       })
+
+      // Update user entries
+      const response = await updateUserEntries(user.id)
+
+      if (response.error) {
+        setErrorMessage(response.error)
+        return
+      }
 
       const boundingBoxes = regions.map((region) => {
         // Accessing and rounding the bounding box values
