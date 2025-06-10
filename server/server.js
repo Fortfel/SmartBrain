@@ -48,23 +48,24 @@ async function verifyPassword(hash, password) {
 }
 
 // mock database
-const users = [
-  { id: 1, name: 'John Doe', email: 'test@email.com', password: 'secret', entries: 0, joined: new Date() },
-  { id: 2, name: 'Bob Cat', email: 'bob@email.com', password: 'secret2', entries: 0, joined: new Date() },
-]
-
-// Hash existing passwords in the mock database
-async function initializeUsers() {
-  for (const user of users) {
-    // Only hash if it's not already a hash (argon2 hashes start with $argon2)
-    if (!user.password.startsWith('$argon2')) {
-      user.password = await hashPassword(user.password)
-    }
-  }
-  console.log('User passwords hashed successfully')
-}
-
-initializeUsers().catch((err) => console.error('Error hashing passwords:', err))
+// const users = [
+//   { id: 1, name: 'John Doe', email: 'test@email.com', password: 'secret', entries: 0, joined: new Date() },
+//   { id: 2, name: 'Bob Cat', email: 'bob@email.com', password: 'secret2', entries: 0, joined: new Date() },
+// ]
+//
+// // Hash existing passwords in the mock database
+// async function initializeUsers() {
+//   for (const user of users) {
+//     // Only hash if it's not already a hash (argon2 hashes start with $argon2)
+//     if (!user.password.startsWith('$argon2')) {
+//       user.password = await hashPassword(user.password)
+//     }
+//   }
+//   console.log('User passwords hashed successfully')
+// }
+//
+// // Call the initialization function
+// initializeUsers().catch((err) => console.error('Error hashing passwords:', err))
 
 const app = express()
 
@@ -72,8 +73,18 @@ const app = express()
 app.use(express.json())
 
 // API Routes
-app.get('/api', (req, res) => {
-  res.json(users)
+app.get('/api', async (req, res) => {
+  try {
+    const users = await prisma.user.findMany({
+      omit: {
+        passwordHash: true,
+      },
+    })
+    res.json(users)
+  } catch (err) {
+    console.error('Error fetching users:', err)
+    res.status(500).json({ error: 'Error fetching users' })
+  }
 })
 
 app.post('/api/login', async (req, res) => {
