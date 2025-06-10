@@ -13,3 +13,38 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id           Int           @id @default(autoincrement())
+  name         String        @db.VarChar(100)
+  email        String        @db.VarChar(100) @unique
+  passwordHash String        @map("password_hash")
+  entries      Int           @default(0)
+  joined       DateTime      @default(now())
+  loginHistory LoginHistory[]
+  imageEntries ImageEntry[]
+
+  @@map("users")
+}
+
+model LoginHistory {
+  id            Int      @id @default(autoincrement())
+  userId        Int      @map("user_id")
+  loginTimestamp DateTime @default(now()) @map("login_timestamp")
+  ipAddress     String?  @map("ip_address")
+  success       Boolean
+  user          User     @relation(fields: [userId], references: [id])
+
+  @@map("login_history")
+}
+
+model ImageEntry {
+  id               Int      @id @default(autoincrement())
+  userId           Int      @map("user_id")
+  imageUrl         String   @map("image_url")
+  submittedAt      DateTime @default(now()) @map("submitted_at")
+  detectionResults Json?    @map("detection_results")
+  user             User     @relation(fields: [userId], references: [id])
+
+  @@map("image_entries")
+}

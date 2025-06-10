@@ -5,15 +5,16 @@ import tailwindcss from '@tailwindcss/vite'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import legacy from '@vitejs/plugin-legacy'
 import VitePluginBrowserSync from 'vite-plugin-browser-sync'
+import dotenv from 'dotenv'
 
 // Load environment variables
-if (fs.existsSync('.env.local')) {
-  process.loadEnvFile('.env.local')
-}
 if (fs.existsSync('.env')) {
-  process.loadEnvFile('.env')
+  dotenv.config({ path: '.env' })
 }
 
+if (fs.existsSync('.env.local')) {
+  dotenv.config({ path: '.env.local', override: true })
+}
 const serverPort = process.env.PORT || 3000
 
 // https://vite.dev/config/

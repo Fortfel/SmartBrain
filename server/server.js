@@ -3,14 +3,20 @@ import path from 'node:path'
 import fs from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import argon2 from 'argon2'
+import dotenv from 'dotenv'
+import { PrismaClient } from '@prisma/client'
 
 // Load environment variables
-if (fs.existsSync('.env.local')) {
-  process.loadEnvFile('.env.local')
-}
 if (fs.existsSync('.env')) {
-  process.loadEnvFile('.env')
+  dotenv.config({ path: '.env' })
 }
+
+if (fs.existsSync('.env.local')) {
+  dotenv.config({ path: '.env.local', override: true })
+}
+
+// Initialize Prisma client
+const prisma = new PrismaClient()
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -22,7 +28,7 @@ const PORT = process.env.PORT || 3000
  * @param {string} password - The plain text password to hash
  * @returns {Promise<string>} - The hashed password
  */
-async function hashPassword(password) {
+export async function hashPassword(password) {
   return await argon2.hash(password, {
     type: argon2.argon2id,
     memoryCost: 2 ** 16, // 64 MiB

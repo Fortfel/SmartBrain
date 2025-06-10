@@ -17,7 +17,12 @@
     "docs": "typedoc",
     "watch:docs": "typedoc --watch",
     "server:dev": "node --watch server/server.js",
-    "start": "node server/server.js"
+    "start": "node server/server.js",
+    "prisma:migrate": "dotenv -e .env.local -- prisma migrate dev",
+    "prisma:migrate:reset": "dotenv -e .env.local -- prisma migrate reset",
+    "prisma:generate": "dotenv -e .env.local -- prisma generate",
+    "prisma:studio": "dotenv -e .env.local -- prisma studio",
+    "prisma:push": "dotenv -e .env.local -- prisma db push"
   },
   "dependencies": {
     "@prisma/client": "^6.9.0",
@@ -27,6 +32,8 @@
     "@tsparticles/slim": "^3.8.1",
     "argon2": "^0.43.0",
     "clsx": "^2.1.1",
+    "dotenv": "^16.5.0",
+    "dotenv-cli": "^8.0.0",
     "express": "^5.1.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
@@ -64,6 +71,9 @@
     "vite": "^6.3.3",
     "vite-plugin-browser-sync": "^4.0.0",
     "vite-tsconfig-paths": "^5.1.4"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
   },
   "typedocOptions": {
     "entryPoints": [
