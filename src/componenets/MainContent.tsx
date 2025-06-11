@@ -147,14 +147,6 @@ const MainContent = (): React.JSX.Element => {
         IMAGE_URL: inputValue, // We can't use imageUrl directly here because it's not yet updated (async)
       })
 
-      // Update user entries
-      const response = await updateUserEntries(user.id)
-
-      if (response.error) {
-        setErrorMessage(response.error)
-        return
-      }
-
       const boundingBoxes = regions.map((region) => {
         // Accessing and rounding the bounding box values
         const boundingBox = region.region_info.bounding_box
@@ -172,6 +164,14 @@ const MainContent = (): React.JSX.Element => {
           rightCol,
         }
       })
+
+      // Update user entries
+      const response = await updateUserEntries(user.id, inputValue, boundingBoxes)
+
+      if (response.error) {
+        setErrorMessage(response.error)
+        return
+      }
 
       setfaceRegions(boundingBoxes)
 

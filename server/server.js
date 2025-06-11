@@ -47,26 +47,6 @@ async function verifyPassword(hash, password) {
   return await argon2.verify(hash, password)
 }
 
-// mock database
-// const users = [
-//   { id: 1, name: 'John Doe', email: 'test@email.com', password: 'secret', entries: 0, joined: new Date() },
-//   { id: 2, name: 'Bob Cat', email: 'bob@email.com', password: 'secret2', entries: 0, joined: new Date() },
-// ]
-//
-// // Hash existing passwords in the mock database
-// async function initializeUsers() {
-//   for (const user of users) {
-//     // Only hash if it's not already a hash (argon2 hashes start with $argon2)
-//     if (!user.password.startsWith('$argon2')) {
-//       user.password = await hashPassword(user.password)
-//     }
-//   }
-//   console.log('User passwords hashed successfully')
-// }
-//
-// // Call the initialization function
-// initializeUsers().catch((err) => console.error('Error hashing passwords:', err))
-
 const app = express()
 
 // Middleware
@@ -76,8 +56,12 @@ app.use(express.json())
 app.get('/api', async (req, res) => {
   try {
     const users = await prisma.user.findMany({
-      omit: {
-        passwordHash: true,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        entries: true,
+        joined: true,
       },
     })
     res.json(users)
@@ -90,80 +74,149 @@ app.get('/api', async (req, res) => {
 app.post('/api/login', async (req, res) => {
   const { email, password } = req.body
 
-  // Find user by email
-  const user = users.find((u) => u.email === email)
+  try {
+    // Find user by email
+    const user = await prisma.user.findUnique({
+      where: { email },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        passwordHash: true,
+        entries: true,
+        joined: true,
+      },
+    })
 
-  if (user) {
-    try {
+    if (user) {
       // Verify password against stored hash
-      const passwordValid = await verifyPassword(user.password, password)
+      const passwordValid = await verifyPassword(user.passwordHash, password)
 
       if (passwordValid) {
+        // Record successful login
+        await prisma.loginHistory.create({
+          data: {
+            userId: user.id,
+            ipAddress: req.ip,
+            success: true,
+          },
+        })
+
         // Don't send the password back to the client
-        const { password, ...userWithoutPassword } = user
+        const { passwordHash, ...userWithoutPassword } = user
         res.json(userWithoutPassword)
       } else {
+        // Record failed login
+        await prisma.loginHistory.create({
+          data: {
+            userId: user.id,
+            ipAddress: req.ip,
+            success: false,
+          },
+        })
+
         res.status(401).json({ error: 'Invalid email or password' })
       }
-    } catch (err) {
-      console.error('Password verification error:', err)
-      res.status(500).json({ error: 'Authentication error' })
+    } else {
+      res.status(401).json({ error: 'Invalid email or password' })
     }
-  } else {
-    res.status(401).json({ error: 'Invalid email or password' })
+  } catch (err) {
+    console.error('Login error:', err)
+    res.status(500).json({ error: 'Authentication error' })
   }
 })
 
 app.post('/api/register', async (req, res) => {
   const { name, email, password } = req.body
 
-  // Check if user already exists
-  if (users.some((u) => u.email === email)) {
-    return res.status(400).json({ error: 'User with this email already exists' })
-  }
-
   try {
-    // Hash the password before storing
-    const hashedPassword = await hashPassword(password)
+    // Check if user already exists
+    const existingUser = await prisma.user.findUnique({
+      where: { email },
+    })
 
-    const user = {
-      id: users.length + 1,
-      name,
-      email,
-      password: hashedPassword,
-      entries: 0,
-      joined: new Date(),
+    if (existingUser) {
+      return res.status(400).json({ error: 'User with this email already exists' })
     }
 
-    users.push(user)
+    // Hash the password before storing
+    const passwordHash = await hashPassword(password)
+
+    // Create new user
+    const user = await prisma.user.create({
+      data: {
+        name,
+        email,
+        passwordHash,
+      },
+    })
 
     // Don't send the password back to the client
-    const { password: _, ...userWithoutPassword } = user
+    const { passwordHash: _, ...userWithoutPassword } = user
     res.json(userWithoutPassword)
   } catch (err) {
-    console.error('Password hashing error:', err)
+    console.error('Registration error:', err)
     res.status(500).json({ error: 'Registration error' })
   }
 })
 
-app.get('/api/profile/:id', (req, res) => {
+app.get('/api/profile/:id', async (req, res) => {
   const { id } = req.params
-  const user = users.find((u) => u.id === Number(id))
-  if (user) {
-    res.json(user)
-  } else {
-    res.status(404).json({ error: 'User not found' })
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: Number(id) },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        entries: true,
+        joined: true,
+      },
+    })
+
+    if (user) {
+      res.json(user)
+    } else {
+      res.status(404).json({ error: 'User not found' })
+    }
+  } catch (err) {
+    console.error('Error fetching user:', err)
+    res.status(500).json({ error: 'Error fetching user' })
   }
 })
 
-app.put('/api/image', (req, res) => {
-  const { id } = req.body
-  const user = users.find((u) => u.id === Number(id))
-  if (user) {
-    user.entries++
-    res.json(user)
-  } else {
-    res.status(404).json({ error: 'User not found' })
+app.put('/api/image', async (req, res) => {
+  const { id, imageUrl, detectionResults } = req.body
+
+  try {
+    // Increment the user's entry count
+    const updatedUser = await prisma.user.update({
+      where: { id: Number(id) },
+      data: {
+        entries: {
+          increment: 1,
+        },
+      },
+    })
+
+    // Store image entry details
+    if (imageUrl) {
+      await prisma.imageEntry.create({
+        data: {
+          userId: Number(id),
+          imageUrl,
+          detectionResults,
+        },
+      })
+    }
+
+    // Don't send the password back to the client
+    const { passwordHash: _, ...userWithoutPassword } = updatedUser
+    res.json(userWithoutPassword)
+  } catch (err) {
+    console.error('Error updating user:', err)
+    res.status(500).json({ error: 'Error updating user' })
   }
 })
 
@@ -180,6 +233,20 @@ if (process.env.NODE_ENV === 'production') {
   })
 }
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`)
-})
+// Connect to the database and start the server
+async function startServer() {
+  try {
+    // Test database connection
+    await prisma.$connect()
+    console.log('Connected to the database successfully')
+
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`)
+    })
+  } catch (error) {
+    console.error('Failed to connect to the database:', error)
+    process.exit(1)
+  }
+}
+
+void startServer()
