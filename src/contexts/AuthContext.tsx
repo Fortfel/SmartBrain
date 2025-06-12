@@ -102,7 +102,7 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
 
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Login failed',
+        error: 'Login failed',
       } satisfies LoginResponse
     } finally {
       setIsLoading(false)
@@ -146,7 +146,7 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
 
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Registration failed',
+        error: 'Registration failed',
       } satisfies RegisterResponse
     } finally {
       setIsLoading(false)
@@ -200,7 +200,7 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
 
         return {
           success: false,
-          error: error instanceof Error ? error.message : 'Failed to update user entries',
+          error: 'Failed to update user entries',
         } satisfies ImageEntryResponse
       }
     },
