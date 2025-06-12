@@ -190,29 +190,33 @@ app.put('/api/image', async (req, res) => {
   const { id, imageUrl, detectionResults } = req.body
 
   try {
-    // Increment the user's entry count
-    const updatedUser = await prisma.user.update({
-      where: { id: Number(id) },
-      data: {
-        entries: {
-          increment: 1,
-        },
-      },
-    })
-
-    // Store image entry details
-    if (imageUrl) {
-      await prisma.imageEntry.create({
+    const result = await prisma.$transaction(async (tx) => {
+      // Increment the user's entry count
+      const updatedUser = await tx.user.update({
+        where: { id: Number(id) },
         data: {
-          userId: Number(id),
-          imageUrl,
-          detectionResults,
+          entries: {
+            increment: 1,
+          },
         },
       })
-    }
+
+      // Store image entry details
+      if (imageUrl) {
+        await tx.imageEntry.create({
+          data: {
+            userId: Number(id),
+            imageUrl,
+            detectionResults,
+          },
+        })
+      }
+
+      return updatedUser
+    })
 
     // Don't send the password back to the client
-    const { passwordHash: _, ...userWithoutPassword } = updatedUser
+    const { passwordHash: _, ...userWithoutPassword } = result
     res.json(userWithoutPassword)
   } catch (err) {
     console.error('Error updating user:', err)
