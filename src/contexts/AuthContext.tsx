@@ -14,20 +14,32 @@ type RegisterResponse = {
   user?: User
 }
 
+type LogoutResponse = {
+  success: boolean
+  error?: string
+}
+
 type ImageEntryResponse = {
   success: boolean
   error?: string
   user?: User
 }
 
+type LoginCallback = (user: User) => void
+type LogoutCallback = (user: User | null) => void
+type UnsubscribeFunction = () => void
+
 type AuthContextType = {
   user: User | null
-  setUser: React.Dispatch<React.SetStateAction<User | null>>
   isLoading: boolean
-  login: (request: LoginRequest) => Promise<LoginResponse>
+  isAuthenticated: boolean
+  isAuthorized: boolean
+  login: (credentials: LoginRequest) => Promise<LoginResponse>
   register: (request: RegisterRequest) => Promise<RegisterResponse>
-  logout: () => void
+  logout: () => Promise<LogoutResponse>
   updateUserEntries: (userId: number, imageUrl: string, detectionResults: Array<unknown>) => Promise<ImageEntryResponse>
+  onLogin: (callback: LoginCallback) => UnsubscribeFunction | undefined
+  onLogout: (callback: LogoutCallback) => UnsubscribeFunction | undefined
 }
 
 type AuthProviderProps = {
@@ -47,6 +59,12 @@ const useAuth = (): AuthContextType => {
 const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
   const [user, setUser] = React.useState<User | null>(null)
   const [isLoading, setIsLoading] = React.useState<boolean>(true)
+  const [isAuthenticated, setIsAuthenticated] = React.useState<boolean>(false)
+  const [isAuthorized, setIsAuthorized] = React.useState<boolean>(false)
+
+  // Store callbacks using useRef to persist across re-renders
+  const loginCallbacksRef = React.useRef<Set<LoginCallback>>(new Set())
+  const logoutCallbacksRef = React.useRef<Set<LogoutCallback>>(new Set())
 
   // Initialize auth state (check for existing session)
   React.useEffect(() => {
@@ -65,100 +83,188 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
     }
   }, [])
 
-  const login = React.useCallback(async ({ email, password }: LoginRequest): Promise<LoginResponse> => {
-    try {
-      setIsLoading(true)
+  const onLogin = React.useCallback((callback: LoginCallback): UnsubscribeFunction | undefined => {
+    if (typeof callback === 'function') {
+      loginCallbacksRef.current.add(callback)
 
-      const response = await fetch('/api/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      })
+      // Return unsubscribe function
+      return () => {
+        loginCallbacksRef.current.delete(callback)
+      }
+    }
+    return
+  }, [])
 
-      if (!response.ok) {
-        const errrorData: ErrorResponse = await response.json()
+  const onLogout = React.useCallback((callback: LogoutCallback): UnsubscribeFunction | undefined => {
+    if (typeof callback === 'function') {
+      logoutCallbacksRef.current.add(callback)
+
+      // Return unsubscribe function
+      return () => {
+        logoutCallbacksRef.current.delete(callback)
+      }
+    }
+    return
+  }, [])
+
+  const executeLoginCallbacks = React.useCallback((user: User) => {
+    loginCallbacksRef.current.forEach((callback) => {
+      try {
+        callback(user)
+      } catch (error) {
+        console.error('Error executing login callback:', error)
+      }
+    })
+  }, [])
+
+  const executeLogoutCallbacks = React.useCallback((user: User | null) => {
+    logoutCallbacksRef.current.forEach((callback) => {
+      try {
+        callback(user)
+      } catch (error) {
+        console.error('Error executing logout callback:', error)
+      }
+    })
+  }, [])
+
+  const login = React.useCallback(
+    async ({ email, password }: LoginRequest): Promise<LoginResponse> => {
+      try {
+        setIsLoading(true)
+
+        const response = await fetch('/api/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, password }),
+        })
+
+        if (!response.ok) {
+          const errrorData: ErrorResponse = await response.json()
+
+          return {
+            success: false,
+            error: errrorData.error || 'Login failed',
+          }
+        }
+
+        const userData: User = await response.json()
+
+        // save user data to session storage
+        sessionStorage.setItem('smart-brain-user', JSON.stringify(userData))
+
+        setUser(userData)
+        setIsAuthenticated(true)
+
+        if (userData.email === 'admin@email.com') {
+          setIsAuthorized(true)
+        }
+
+        // Execute all registered login callbacks
+        executeLoginCallbacks(userData)
+
+        return {
+          success: true,
+          user: userData,
+        }
+      } catch (error) {
+        console.error('Login failed:', error)
 
         return {
           success: false,
-          error: errrorData.error || 'Login failed',
-        } satisfies LoginResponse
+          error: 'Login failed',
+        }
+      } finally {
+        setIsLoading(false)
       }
+    },
+    [executeLoginCallbacks],
+  )
 
-      const userData: User = await response.json()
+  const register = React.useCallback(
+    async ({ name, email, password }: RegisterRequest): Promise<RegisterResponse> => {
+      try {
+        setIsLoading(true)
 
-      // save user data to session storage
-      sessionStorage.setItem('smart-brain-user', JSON.stringify(userData))
+        const response = await fetch('/api/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ name, email, password }),
+        })
 
-      setUser(userData)
+        if (!response.ok) {
+          const errrorData: ErrorResponse = await response.json()
 
-      return {
-        success: true,
-        user: userData,
-      } satisfies LoginResponse
-    } catch (error) {
-      console.error('Login failed:', error)
+          return {
+            success: false,
+            error: errrorData.error || 'Registration failed',
+          }
+        }
 
-      return {
-        success: false,
-        error: 'Login failed',
-      } satisfies LoginResponse
-    } finally {
-      setIsLoading(false)
-    }
-  }, [])
+        const userData: User = await response.json()
 
-  const register = React.useCallback(async ({ name, email, password }: RegisterRequest): Promise<RegisterResponse> => {
-    try {
-      setIsLoading(true)
+        // save user data to session storage
+        sessionStorage.setItem('smart-brain-user', JSON.stringify(userData))
 
-      const response = await fetch('/api/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name, email, password }),
-      })
+        setUser(userData)
+        setIsAuthenticated(true)
 
-      if (!response.ok) {
-        const errrorData: ErrorResponse = await response.json()
+        if (userData.email === 'admin@email.com') {
+          setIsAuthorized(true)
+        }
+
+        // Execute all login callbacks (since registration also logs the user in)
+        executeLoginCallbacks(userData)
+
+        return {
+          success: true,
+          user: userData,
+        }
+      } catch (error) {
+        console.error('Registration failed:', error)
 
         return {
           success: false,
-          error: errrorData.error || 'Registration failed',
-        } satisfies RegisterResponse
+          error: 'Registration failed',
+        }
+      } finally {
+        setIsLoading(false)
       }
+    },
+    [executeLoginCallbacks],
+  )
 
-      const userData: User = await response.json()
+  const logout = React.useCallback(async (): Promise<LogoutResponse> => {
+    try {
+      setIsLoading(true)
 
-      // save user data to session storage
-      sessionStorage.setItem('smart-brain-user', JSON.stringify(userData))
+      // Remove user data from session storage
+      sessionStorage.removeItem('smart-brain-user')
 
-      setUser(userData)
+      setUser(null)
+      setIsAuthenticated(false)
+      setIsAuthorized(false)
+
+      // Execute all logout callbacks
+      executeLogoutCallbacks(user)
 
       return {
         success: true,
-        user: userData,
-      } satisfies RegisterResponse
+      }
     } catch (error) {
-      console.error('Registration failed:', error)
+      console.error('Error logout:', error)
 
       return {
         success: false,
-        error: 'Registration failed',
-      } satisfies RegisterResponse
+        error: 'Logout failed',
+      }
     } finally {
       setIsLoading(false)
     }
-  }, [])
-
-  const logout = React.useCallback((): void => {
-    // Remove user data from session storage
-    sessionStorage.removeItem('smart-brain-user')
-
-    setUser(null)
-  }, [])
+  }, [executeLogoutCallbacks, user])
 
   const updateUserEntries = React.useCallback(
     async (userId: number, imageUrl: string, detectionResults: Array<unknown>): Promise<ImageEntryResponse> => {
@@ -181,7 +287,7 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
           return {
             success: false,
             error: errrorData.error || 'Failed to update user entries',
-          } satisfies ImageEntryResponse
+          }
         }
 
         const userData: User = await response.json()
@@ -194,14 +300,14 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
         return {
           success: true,
           user: userData,
-        } satisfies ImageEntryResponse
+        }
       } catch (error) {
         console.error('Failed to update user entries:', error)
 
         return {
           success: false,
           error: 'Failed to update user entries',
-        } satisfies ImageEntryResponse
+        }
       }
     },
     [],
@@ -211,24 +317,32 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
   const contextValue = React.useMemo(
     () => ({
       user,
-      setUser,
       isLoading,
+      isAuthenticated,
+      isAuthorized,
       login,
       register,
       logout,
       updateUserEntries,
+      onLogin,
+      onLogout,
     }),
-    [user, isLoading, login, register, logout, updateUserEntries],
+    [user, isLoading, isAuthenticated, isAuthorized, login, register, logout, updateUserEntries, onLogin, onLogout],
   )
 
-  return <AuthContext value={contextValue}>{children}</AuthContext>
+  return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
 }
 
 export {
   type LoginResponse,
   type RegisterResponse,
+  type LogoutResponse,
+  type ImageEntryResponse,
   type AuthContextType,
   type AuthProviderProps,
+  type LoginCallback,
+  type LogoutCallback,
+  type UnsubscribeFunction,
   AuthContext,
   useAuth,
   AuthProvider,
