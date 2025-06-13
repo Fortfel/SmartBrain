@@ -116,12 +116,26 @@ function getRequestOptions({ PAT, USER_ID, APP_ID, IMAGE_URL }: RequestOptionsAr
 }
 
 const MainContent = (): React.JSX.Element => {
-  const [inputValue, setInputValue] = React.useState('https://samples.clarifai.com/metro-north.jpg')
+  const [inputValue, setInputValue] = React.useState('') //https://samples.clarifai.com/metro-north.jpg
   const [imageUrl, setImageUrl] = React.useState('')
   const [isLoading, setIsLoading] = React.useState(false)
   const [errorMessage, setErrorMessage] = React.useState('')
   const [faceRegions, setfaceRegions] = React.useState<Array<BoundingBox>>([])
-  const { user, updateUserEntries } = useAuth()
+  const { user, updateUserEntries, onLogout } = useAuth()
+
+  React.useEffect(() => {
+    const unsubscribe = onLogout(() => {
+      // Reset states
+      setErrorMessage('')
+      setImageUrl('')
+      setfaceRegions([])
+      setInputValue('')
+    })
+
+    return () => {
+      unsubscribe?.()
+    }
+  }, [onLogout])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value)

@@ -72,7 +72,14 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
       const storedUser = sessionStorage.getItem('smart-brain-user')
 
       if (storedUser) {
-        setUser(JSON.parse(storedUser))
+        const parsedUser: User = JSON.parse(storedUser)
+
+        setUser(parsedUser)
+        setIsAuthenticated(true)
+
+        if (parsedUser.email === 'admin@email.com') {
+          setIsAuthorized(true)
+        }
       }
     } catch (error) {
       console.error('Error initializing auth state:', error)

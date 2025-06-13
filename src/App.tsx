@@ -44,7 +44,7 @@ const App = (): React.JSX.Element => {
 
   const handleSignInClick = () => {
     if (user) {
-      logout()
+      void logout()
     } else {
       loginDialogRef.current?.showModal()
     }
