@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { type RegisterResponse, useAuth } from '@/contexts/AuthContext.tsx'
+import { type RegisterResponse, useAuth } from '@/contexts'
 
 type RegisterProps = {
   onSuccess: () => void

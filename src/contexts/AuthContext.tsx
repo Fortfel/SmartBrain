@@ -1,63 +1,57 @@
 import * as React from 'react'
+import type { LoginRequestBody, RegisterRequestBody, EntriesUpdateRequestBody, SafeUser } from '@/../server/types'
+import { AuthContext } from '@/contexts/use-auth.ts'
 
-import { User, LoginRequest, RegisterRequest, ErrorResponse } from '@/types/api-types'
-
-type LoginResponse = {
+export type LoginResponse = {
   success: boolean
   error?: string
-  user?: User
+  user?: SafeUser
 }
 
-type RegisterResponse = {
+export type RegisterResponse = {
   success: boolean
   error?: string
-  user?: User
+  user?: SafeUser
 }
 
-type LogoutResponse = {
+export type LogoutResponse = {
   success: boolean
   error?: string
 }
 
-type ImageEntryResponse = {
+export type ImageEntryResponse = {
   success: boolean
   error?: string
-  user?: User
+  user?: SafeUser
 }
 
-type LoginCallback = (user: User) => void
-type LogoutCallback = (user: User | null) => void
-type UnsubscribeFunction = () => void
+export type ErrorResponse = {
+  error: string
+}
 
-type AuthContextType = {
-  user: User | null
+export type LoginCallback = (user: SafeUser) => void
+export type LogoutCallback = (user: SafeUser | null) => void
+export type UnsubscribeFunction = () => void
+
+export type AuthContextType = {
+  user: SafeUser | null
   isLoading: boolean
   isAuthenticated: boolean
   isAuthorized: boolean
-  login: (credentials: LoginRequest) => Promise<LoginResponse>
-  register: (request: RegisterRequest) => Promise<RegisterResponse>
-  logout: () => Promise<LogoutResponse>
-  updateUserEntries: (userId: number, imageUrl: string, detectionResults: Array<unknown>) => Promise<ImageEntryResponse>
+  login: (credentials: LoginRequestBody) => Promise<LoginResponse>
+  register: (request: RegisterRequestBody) => Promise<RegisterResponse>
+  logout: () => LogoutResponse
+  updateUserEntries: (request: EntriesUpdateRequestBody) => Promise<ImageEntryResponse>
   onLogin: (callback: LoginCallback) => UnsubscribeFunction | undefined
   onLogout: (callback: LogoutCallback) => UnsubscribeFunction | undefined
 }
 
-type AuthProviderProps = {
+export type AuthProviderProps = {
   children: React.ReactNode
 }
 
-const AuthContext = React.createContext<AuthContextType | null>(null)
-
-const useAuth = (): AuthContextType => {
-  const context = React.useContext(AuthContext)
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider')
-  }
-  return context
-}
-
 const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
-  const [user, setUser] = React.useState<User | null>(null)
+  const [user, setUser] = React.useState<SafeUser | null>(null)
   const [isLoading, setIsLoading] = React.useState<boolean>(true)
   const [isAuthenticated, setIsAuthenticated] = React.useState<boolean>(false)
   const [isAuthorized, setIsAuthorized] = React.useState<boolean>(false)
@@ -72,7 +66,7 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
       const storedUser = sessionStorage.getItem('smart-brain-user')
 
       if (storedUser) {
-        const parsedUser: User = JSON.parse(storedUser)
+        const parsedUser = JSON.parse(storedUser) as SafeUser
 
         setUser(parsedUser)
         setIsAuthenticated(true)
@@ -114,7 +108,7 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
     return
   }, [])
 
-  const executeLoginCallbacks = React.useCallback((user: User) => {
+  const executeLoginCallbacks = React.useCallback((user: SafeUser) => {
     loginCallbacksRef.current.forEach((callback) => {
       try {
         callback(user)
@@ -124,7 +118,7 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
     })
   }, [])
 
-  const executeLogoutCallbacks = React.useCallback((user: User | null) => {
+  const executeLogoutCallbacks = React.useCallback((user: SafeUser | null) => {
     logoutCallbacksRef.current.forEach((callback) => {
       try {
         callback(user)
@@ -135,7 +129,7 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
   }, [])
 
   const login = React.useCallback(
-    async ({ email, password }: LoginRequest): Promise<LoginResponse> => {
+    async ({ email, password }: LoginRequestBody): Promise<LoginResponse> => {
       try {
         setIsLoading(true)
 
@@ -148,7 +142,7 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
         })
 
         if (!response.ok) {
-          const errrorData: ErrorResponse = await response.json()
+          const errrorData = (await response.json()) as ErrorResponse
 
           return {
             success: false,
@@ -156,7 +150,7 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
           }
         }
 
-        const userData: User = await response.json()
+        const userData = (await response.json()) as SafeUser
 
         // save user data to session storage
         sessionStorage.setItem('smart-brain-user', JSON.stringify(userData))
@@ -190,7 +184,7 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
   )
 
   const register = React.useCallback(
-    async ({ name, email, password }: RegisterRequest): Promise<RegisterResponse> => {
+    async ({ name, email, password }: RegisterRequestBody): Promise<RegisterResponse> => {
       try {
         setIsLoading(true)
 
@@ -203,7 +197,7 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
         })
 
         if (!response.ok) {
-          const errrorData: ErrorResponse = await response.json()
+          const errrorData = (await response.json()) as ErrorResponse
 
           return {
             success: false,
@@ -211,7 +205,7 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
           }
         }
 
-        const userData: User = await response.json()
+        const userData = (await response.json()) as SafeUser
 
         // save user data to session storage
         sessionStorage.setItem('smart-brain-user', JSON.stringify(userData))
@@ -244,7 +238,7 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
     [executeLoginCallbacks],
   )
 
-  const logout = React.useCallback(async (): Promise<LogoutResponse> => {
+  const logout = React.useCallback((): LogoutResponse => {
     try {
       setIsLoading(true)
 
@@ -274,7 +268,7 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
   }, [executeLogoutCallbacks, user])
 
   const updateUserEntries = React.useCallback(
-    async (userId: number, imageUrl: string, detectionResults: Array<unknown>): Promise<ImageEntryResponse> => {
+    async ({ id, imageUrl, detectionResults }: EntriesUpdateRequestBody): Promise<ImageEntryResponse> => {
       try {
         const response = await fetch('/api/image', {
           method: 'PUT',
@@ -282,14 +276,14 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            id: userId,
+            id,
             imageUrl,
             detectionResults,
           }),
         })
 
         if (!response.ok) {
-          const errrorData: ErrorResponse = await response.json()
+          const errrorData = (await response.json()) as ErrorResponse
 
           return {
             success: false,
@@ -297,7 +291,7 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
           }
         }
 
-        const userData: User = await response.json()
+        const userData = (await response.json()) as SafeUser
 
         // save user data to session storage
         sessionStorage.setItem('smart-brain-user', JSON.stringify(userData))
@@ -337,20 +331,7 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
     [user, isLoading, isAuthenticated, isAuthorized, login, register, logout, updateUserEntries, onLogin, onLogout],
   )
 
-  return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
+  return <AuthContext value={contextValue}>{children}</AuthContext>
 }
 
-export {
-  type LoginResponse,
-  type RegisterResponse,
-  type LogoutResponse,
-  type ImageEntryResponse,
-  type AuthContextType,
-  type AuthProviderProps,
-  type LoginCallback,
-  type LogoutCallback,
-  type UnsubscribeFunction,
-  AuthContext,
-  useAuth,
-  AuthProvider,
-}
+export { AuthProvider }

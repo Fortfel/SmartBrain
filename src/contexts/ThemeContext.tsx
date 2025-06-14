@@ -1,8 +1,9 @@
 import * as React from 'react'
+import { ThemeContext } from '@/contexts/use-theme.ts'
 
-type ThemeType = 'light' | 'dark'
+export type ThemeType = 'light' | 'dark'
 
-type ThemeContextType = {
+export type ThemeContextType = {
   theme: ThemeType
   setTheme: React.Dispatch<React.SetStateAction<ThemeType>>
   toggleTheme: () => void
@@ -10,25 +11,15 @@ type ThemeContextType = {
   isLightMode: boolean
 }
 
-type ThemeProviderProps = {
+export type ThemeProviderProps = {
   children: React.ReactNode
   defaultTheme?: ThemeType
-}
-
-const ThemeContext = React.createContext<ThemeContextType | null>(null)
-
-const useTheme = (): ThemeContextType => {
-  const context = React.useContext(ThemeContext)
-  if (!context) {
-    throw new Error('useTheme must be used within a ThemeProvider')
-  }
-  return context
 }
 
 const ThemeProvider = ({ children, defaultTheme = 'light' }: ThemeProviderProps): React.JSX.Element => {
   const [theme, setTheme] = React.useState<ThemeType>(() => {
     // Check if the user has a saved theme preference
-    const savedTheme = localStorage.getItem('theme') as ThemeType
+    const savedTheme = localStorage.getItem('theme')
     if (savedTheme && (savedTheme === 'light' || savedTheme === 'dark')) {
       return savedTheme
     } else {
@@ -65,4 +56,4 @@ const ThemeProvider = ({ children, defaultTheme = 'light' }: ThemeProviderProps)
   return <ThemeContext value={contextValue}>{children}</ThemeContext>
 }
 
-export { type ThemeType, type ThemeContextType, type ThemeProviderProps, ThemeContext, useTheme, ThemeProvider }
+export { ThemeProvider }

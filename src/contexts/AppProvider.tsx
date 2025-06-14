@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { ThemeProvider } from './ThemeContext.tsx'
-import { AuthProvider } from './AuthContext.tsx'
+import { ThemeProvider } from '@/contexts/ThemeContext.tsx'
+import { AuthProvider } from '@/contexts/AuthContext.tsx'
 
 type AppProviderProps = {
   children: React.ReactNode

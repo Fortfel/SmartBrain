@@ -7,7 +7,7 @@ import { loadSlim } from '@tsparticles/slim'
 import { loadPolygonMaskPlugin } from '@tsparticles/plugin-polygon-mask'
 import { particlesOptionsPolygon } from '@/assets/particlesOptions.ts'
 import { Navigation, type NavigationProps } from '@/componenets/Navigation.tsx'
-import { useTheme } from '@/contexts/ThemeContext.tsx'
+import { useTheme } from '@/contexts'
 
 type HeaderProps = {
   brainAnimationDuration: number

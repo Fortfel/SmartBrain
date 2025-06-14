@@ -1,7 +1,7 @@
 import * as React from 'react'
 import Brain from '@/assets/img/Brain.tsx'
 import { ThemeController } from '@/componenets/ThemeController.tsx'
-import { useAuth } from '@/contexts/AuthContext.tsx'
+import { useAuth } from '@/contexts'
 
 export type NavigationProps = {
   onSignInClick: () => void

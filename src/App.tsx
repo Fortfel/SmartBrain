@@ -7,8 +7,8 @@ import { particlesOoptionsLinks } from '@/assets/particlesOptions.ts'
 import { Header } from '@/componenets/Header.tsx'
 import { MainContent } from '@/componenets/MainContent.tsx'
 import { SignIn } from '@/componenets/SignIn/SignIn.tsx'
-import { useTheme } from '@/contexts/ThemeContext.tsx'
-import { useAuth } from '@/contexts/AuthContext.tsx'
+import { useTheme } from '@/contexts'
+import { useAuth } from '@/contexts'
 
 // Configuration
 const BRAIN_ANIMATION_DURATION = 1.8 // in seconds

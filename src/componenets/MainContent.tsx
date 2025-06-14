@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { ImageLinkForm } from '@/componenets/ImageLinkForm.tsx'
 import { type BoundingBox, FaceRecognition } from '@/componenets/FaceRecognition.tsx'
-import { useAuth } from '@/contexts/AuthContext.tsx'
+import { useAuth } from '@/contexts'
 
 type ClarifaiRegion = {
   data: {

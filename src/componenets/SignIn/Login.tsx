@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { type LoginResponse, useAuth } from '@/contexts/AuthContext.tsx'
+import { type LoginResponse, useAuth } from '@/contexts'
 
 type LoginProps = {
   onSuccess: () => void

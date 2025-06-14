@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useAuth } from '@/contexts/AuthContext.tsx'
+import { useAuth } from '@/contexts'
 
 type ImageLinkFormProps = {
   inputValue: string

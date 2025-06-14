@@ -1,7 +1,7 @@
 import * as React from 'react'
 
 import placeholder from '@/assets/img/placeholder.png'
-import { useAuth } from '@/contexts/AuthContext.tsx'
+import { useAuth } from '@/contexts'
 
 export type BoundingBox = {
   value: number

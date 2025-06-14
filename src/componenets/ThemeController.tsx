@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useTheme } from '@/contexts/ThemeContext.tsx'
+import { useTheme } from '@/contexts'
 
 const ThemeController = (): React.JSX.Element => {
   const { toggleTheme, isDarkMode } = useTheme()
