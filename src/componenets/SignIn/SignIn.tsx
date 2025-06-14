@@ -4,7 +4,7 @@ import { Login } from '@/componenets/SignIn/Login.tsx'
 import { Register } from '@/componenets/SignIn/Register.tsx'
 
 type SignInProps = {
-  ref: React.RefObject<HTMLDialogElement>
+  ref: React.RefObject<HTMLDialogElement | null>
 }
 
 const SignIn = ({ ref }: SignInProps): React.JSX.Element => {
@@ -12,7 +12,7 @@ const SignIn = ({ ref }: SignInProps): React.JSX.Element => {
 
   const isLoginRoute = route === 'login'
 
-  const closeModal = () => {
+  const closeModal = (): void => {
     ref.current?.close()
   }
 
@@ -29,7 +29,7 @@ const SignIn = ({ ref }: SignInProps): React.JSX.Element => {
     >
       <div className="modal-box sm:p-10">
         <SvgBrain className="hidden size-8 w-full justify-center fill-current sm:flex" />
-        <button className="btn absolute top-2 right-2 btn-circle btn-ghost btn-sm" onClick={closeModal}>
+        <button type="button" className="btn absolute top-2 right-2 btn-circle btn-ghost btn-sm" onClick={closeModal}>
           ✕
         </button>
         <h2 className="mt-10 text-center text-2xl/9 font-bold tracking-tight">
@@ -42,6 +42,7 @@ const SignIn = ({ ref }: SignInProps): React.JSX.Element => {
             <p className="mt-5 text-center text-sm/6 text-base-content/50">
               Don't have an account?{' '}
               <button
+                type="button"
                 className="btn p-0 align-baseline font-semibold text-primary btn-link no-underline"
                 onClick={() => {
                   setRoute('register')
@@ -52,6 +53,7 @@ const SignIn = ({ ref }: SignInProps): React.JSX.Element => {
             </p>
           ) : (
             <button
+              type="button"
               className="btn mt-5 p-0 align-baseline font-semibold text-primary btn-link no-underline"
               onClick={() => {
                 setRoute('login')

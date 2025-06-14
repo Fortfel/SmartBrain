@@ -20,7 +20,7 @@ const App = (): React.JSX.Element => {
   const { theme, isDarkMode } = useTheme()
   const { user, logout } = useAuth()
 
-  const loginDialogRef = React.useRef<HTMLDialogElement>(null!)
+  const loginDialogRef = React.useRef<HTMLDialogElement>(null)
 
   const particlesOptionsWithTheme: ISourceOptions = particlesOoptionsLinks
 
@@ -30,21 +30,25 @@ const App = (): React.JSX.Element => {
       // await loadFull(engine)
       await loadSlim(engine)
       // await loadBasic(engine)
-    }).then(() => {
-      setAreParticlesLoaded(true)
     })
+      .then(() => {
+        setAreParticlesLoaded(true)
+      })
+      .catch((e: unknown) => {
+        console.error(e)
+      })
   }, [])
 
   const handleParticlesLoaded = React.useCallback(
     async (container?: Container) => {
-      container?.loadTheme(theme)
+      await container?.loadTheme(theme)
     },
     [theme],
   )
 
-  const handleSignInClick = () => {
+  const handleSignInClick = (): void => {
     if (user) {
-      void logout()
+      logout()
     } else {
       loginDialogRef.current?.showModal()
     }
@@ -69,7 +73,7 @@ const App = (): React.JSX.Element => {
           options={particlesOptionsWithTheme}
         />
       )}
-      <div className={`relative flex min-h-dvh flex-col gap-15 overflow-x-hidden`}>
+      <div className={'relative flex min-h-dvh flex-col gap-15 overflow-x-hidden'}>
         <div className={heroBackgroundGrid}></div>
         <div className="hero-background"></div>
         <Header brainAnimationDuration={BRAIN_ANIMATION_DURATION} onSignInClick={handleSignInClick} />

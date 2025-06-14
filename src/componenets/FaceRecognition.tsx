@@ -57,13 +57,14 @@ const FaceRecognition = ({ imageUrl, errorMessage, faceRegions }: FaceRecognitio
 
                 return (
                   <div
+                    /* eslint-disable-next-line react-x/no-array-index-key */
                     key={index}
                     className="absolute border-2 border-[#308b93]"
                     style={{
-                      top: topRow * 100 + '%',
-                      left: leftCol * 100 + '%',
-                      width: (rightCol - leftCol) * 100 + '%',
-                      height: (bottomRow - topRow) * 100 + '%',
+                      top: (topRow * 100).toString() + '%',
+                      left: (leftCol * 100).toString() + '%',
+                      width: ((rightCol - leftCol) * 100).toString() + '%',
+                      height: ((bottomRow - topRow) * 100).toString() + '%',
                     }}
                   ></div>
                 )

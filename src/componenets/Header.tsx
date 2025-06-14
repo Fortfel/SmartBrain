@@ -28,14 +28,18 @@ const Header = ({ brainAnimationDuration, ...navigationProps }: HeaderProps): Re
 
       await loadSlim(engine)
       await loadPolygonMaskPlugin(engine)
-    }).then(() => {
-      setAreParticlesLoaded(true)
     })
+      .then(() => {
+        setAreParticlesLoaded(true)
+      })
+      .catch((e: unknown) => {
+        console.error(e)
+      })
   }, [])
 
   const handleParticlesLoaded = React.useCallback(
     async (container?: Container) => {
-      container?.loadTheme(theme)
+      await container?.loadTheme(theme)
     },
     [theme],
   )
@@ -53,7 +57,7 @@ const Header = ({ brainAnimationDuration, ...navigationProps }: HeaderProps): Re
     <header
       className="text-base-content line-color-base-content/20"
       // @ts-expect-error TS2353: Object literal may only specify known properties
-      style={{ '--brain-animation-duration': `${brainAnimationDuration}s` }}
+      style={{ '--brain-animation-duration': `${brainAnimationDuration.toString()}s` }}
     >
       <div className="mx-auto flex max-w-[var(--breakpoint-lg)] flex-col items-center gap-7">
         <Navigation {...navigationProps} />

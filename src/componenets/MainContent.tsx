@@ -65,11 +65,11 @@ async function fetchClarifaiData({
     throw new Error(`HTTP error! status: ${response.status.toString()}`)
   }
 
-  const result: ClarifaiResponse = await response.json()
+  const result = (await response.json()) as ClarifaiResponse
 
   // Check the status code from the API response
-  const statusCode = result.outputs?.[0]?.status?.code
-  const statusDescription = result.outputs?.[0]?.status?.description || 'Unknown error'
+  const statusCode = result.outputs?.[0]?.status?.code // eslint-disable-line @typescript-eslint/no-unnecessary-condition
+  const statusDescription = result.outputs?.[0]?.status?.description || 'Unknown error' // eslint-disable-line @typescript-eslint/no-unnecessary-condition
 
   if (!statusCode) {
     throw new Error('Invalid API response format')
@@ -77,17 +77,13 @@ async function fetchClarifaiData({
 
   // Status code 10000 is success according to Clarifai API
   if (statusCode !== 10000) {
-    throw new Error(`API Error (${statusCode}): ${statusDescription}`)
-  }
-
-  if (!result.outputs?.[0]?.data?.regions) {
-    throw new Error('No face regions detected in the image')
+    throw new Error(`API Error (${statusCode.toString()}): ${statusDescription}`)
   }
 
   return result.outputs[0].data.regions
 }
 
-function getRequestOptions({ PAT, USER_ID, APP_ID, IMAGE_URL }: RequestOptionsArgs) {
+function getRequestOptions({ PAT, USER_ID, APP_ID, IMAGE_URL }: RequestOptionsArgs): RequestInit {
   const raw = JSON.stringify({
     user_app_id: {
       user_id: USER_ID,
@@ -132,16 +128,16 @@ const MainContent = (): React.JSX.Element => {
       setInputValue('')
     })
 
-    return () => {
+    return (): void => {
       unsubscribe?.()
     }
   }, [onLogout])
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     setInputValue(e.target.value)
   }
 
-  const handlePictureSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handlePictureSubmit = async (e: React.MouseEvent<HTMLButtonElement>): Promise<void> => {
     if (!user) {
       setErrorMessage('Please sign in to use this feature')
       return
@@ -155,9 +151,9 @@ const MainContent = (): React.JSX.Element => {
 
     try {
       const regions = await fetchClarifaiData({
-        PAT: import.meta.env.VITE_CLARIFAI_PAT,
-        USER_ID: import.meta.env.VITE_CLARIFAI_USER_ID,
-        APP_ID: import.meta.env.VITE_CLARIFAI_APP_ID,
+        PAT: import.meta.env.VITE_CLARIFAI_PAT as string,
+        USER_ID: import.meta.env.VITE_CLARIFAI_USER_ID as string,
+        APP_ID: import.meta.env.VITE_CLARIFAI_APP_ID as string,
         IMAGE_URL: inputValue, // We can't use imageUrl directly here because it's not yet updated (async)
       })
 
@@ -180,7 +176,11 @@ const MainContent = (): React.JSX.Element => {
       })
 
       // Update user entries
-      const response = await updateUserEntries(user.id, inputValue, boundingBoxes)
+      const response = await updateUserEntries({
+        id: user.id,
+        imageUrl: inputValue,
+        detectionResults: boundingBoxes,
+      })
 
       if (response.error) {
         setErrorMessage(response.error)

@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts'
 type ImageLinkFormProps = {
   inputValue: string
   onInputChange: (event: React.ChangeEvent<HTMLInputElement>) => void
-  onPictureSubmit: (event: React.MouseEvent<HTMLButtonElement>) => void
+  onPictureSubmit: (event: React.MouseEvent<HTMLButtonElement>) => Promise<void>
   isLoading: boolean
 }
 
@@ -19,9 +19,9 @@ const ImageLinkForm = ({
   const inputRef = React.useRef<HTMLInputElement>(null)
 
   // Check validity before calling onPictureSubmit
-  const handleButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleButtonClick = (event: React.MouseEvent<HTMLButtonElement>): void => {
     if (inputRef.current && inputRef.current.validity.valid) {
-      onPictureSubmit(event)
+      void onPictureSubmit(event)
     }
   }
 
@@ -53,6 +53,7 @@ const ImageLinkForm = ({
           <p className="validator-hint">Must be valid URL</p>
         </div>
         <button
+          type="submit"
           className="btn join-item btn-lg btn-secondary"
           onClick={handleButtonClick}
           disabled={isLoading || !user}
