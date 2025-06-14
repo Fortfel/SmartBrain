@@ -13,13 +13,13 @@ import reactCompiler from 'eslint-plugin-react-compiler'
 
 export default tseslint.config(
   { ignores: ['dist'] },
+  js.configs.recommended,
+  ...tseslint.configs.recommendedTypeChecked,
+  ...tseslint.configs.strictTypeChecked,
+  prettier,
+
+  // TypeScript files configuration
   {
-    extends: [
-      js.configs.recommended,
-      ...tseslint.configs.recommendedTypeChecked,
-      ...tseslint.configs.strictTypeChecked,
-      prettier,
-    ],
     files: ['**/*.{ts,tsx}'],
     languageOptions: {
       parser: tseslint.parser,
@@ -31,6 +31,8 @@ export default tseslint.config(
       ecmaVersion: 2020,
       globals: globals.browser,
     },
+
+    // Plugin rules
     plugins: {
       'react-hooks': reactHooks,
       'react-refresh': reactRefresh,
@@ -38,9 +40,9 @@ export default tseslint.config(
       'react-dom': reactDom,
       tsdoc: eslintPluginTsdoc,
       import: eslintPluginImport,
-
       'react-compiler': reactCompiler,
     },
+
     rules: {
       ...reactHooks.configs.recommended.rules,
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
@@ -61,13 +63,6 @@ export default tseslint.config(
         },
       ],
       'import/no-default-export': 'error',
-      // In case of exceptions disable the rule
-      overrides: [
-        {
-          files: ['src/assets/**/*'],
-          rules: { 'import/no-default-export': 'off' },
-        },
-      ],
       'no-unused-vars': 'off',
       '@typescript-eslint/switch-exhaustiveness-check': 'error',
       '@typescript-eslint/ban-ts-comment': [
@@ -117,6 +112,13 @@ export default tseslint.config(
       ],
       'react-hooks/rules-of-hooks': 'error',
       'tsdoc/syntax': 'warn',
+    },
+  },
+  {
+    // Override for specific files
+    files: ['src/assets/**/*', 'server/**/*'],
+    rules: {
+      'import/no-default-export': 'off',
     },
   },
 )
