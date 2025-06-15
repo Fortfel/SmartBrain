@@ -9,6 +9,7 @@ import { handleLogin } from './controllers/login.js'
 import { handleRegister } from './controllers/register.js'
 import { handleProfileGet } from './controllers/profile.js'
 import { handleEntriesUpdate } from './controllers/image.js'
+import { hanfleClarifaiRequest } from './controllers/clarifai.js'
 
 // Load environment variables
 if (fs.existsSync('.env')) {
@@ -79,6 +80,8 @@ app.post('/api/register', handleRegister)
 app.get('/api/profile/:id', handleProfileGet)
 
 app.put('/api/image', handleEntriesUpdate)
+
+app.post('/api/clarifai', hanfleClarifaiRequest)
 
 // For production: serve the static files from the Vite build
 if (process.env.NODE_ENV === 'production') {

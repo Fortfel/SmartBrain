@@ -32,6 +32,7 @@
     "@tsparticles/react": "^3.0.0",
     "@tsparticles/slim": "^3.8.1",
     "argon2": "^0.43.0",
+    "clarifai-nodejs-grpc": "^11.5.5",
     "clsx": "^2.1.1",
     "dotenv": "^16.5.0",
     "dotenv-cli": "^8.0.0",
