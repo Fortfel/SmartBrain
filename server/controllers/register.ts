@@ -6,6 +6,22 @@ import { hashPassword } from '../server.js'
 const handleRegister = async (req: Request<object, object, RegisterRequestBody>, res: Response): Promise<void> => {
   const { name, email, password } = req.body
 
+  // Validate the request body
+  if (!name || !email || !password) {
+    res.status(400).json({ error: 'Missing required fields' })
+    return
+  }
+
+  if (!email.includes('@')) {
+    res.status(400).json({ error: 'Invalid email format' })
+    return
+  }
+
+  if (password.length < 5) {
+    res.status(400).json({ error: 'Password must be at least 5 characters' })
+    return
+  }
+
   try {
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({

@@ -12,6 +12,22 @@ import { verifyPassword } from '../server.js'
 const handleLogin = async (req: Request<object, object, LoginRequestBody>, res: Response): Promise<void> => {
   const { email, password } = req.body
 
+  // Validate the request body
+  if (!email || !password) {
+    res.status(400).json({ error: 'Missing required fields' })
+    return
+  }
+
+  if (!email.includes('@')) {
+    res.status(400).json({ error: 'Invalid email format' })
+    return
+  }
+
+  if (password.length < 5) {
+    res.status(400).json({ error: 'Password must be at least 5 characters' })
+    return
+  }
+
   try {
     // Find user by email
     const user = await prisma.user.findUnique({
