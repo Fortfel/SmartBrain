@@ -47,6 +47,7 @@ type RequestOptionsArgs = {
 const CORS_PROXY = 'https://cors-anywhere.herokuapp.com/'
 // Change these to whatever model and image URL you want to use
 const MODEL_ID = 'face-detection'
+const MODEL_VERSION_ID = '6dc7e46bc9124c5c8824be4822abe105'
 
 async function fetchClarifaiData({
   PAT,
@@ -57,7 +58,12 @@ async function fetchClarifaiData({
   const requestOptions = getRequestOptions({ PAT, USER_ID, APP_ID, IMAGE_URL })
 
   const response = await fetch(
-    (import.meta.env.DEV ? CORS_PROXY : '') + 'https://api.clarifai.com/v2/models/' + MODEL_ID + '/outputs',
+    (import.meta.env.DEV ? CORS_PROXY : '') +
+      'https://api.clarifai.com/v2/models/' +
+      MODEL_ID +
+      '/versions/' +
+      MODEL_VERSION_ID +
+      '/outputs',
     requestOptions,
   )
 
@@ -189,7 +195,7 @@ const MainContent = (): React.JSX.Element => {
 
       setfaceRegions(boundingBoxes)
 
-      console.log('Face regions detected:', regions)
+      // console.log('Face regions detected:', regions)
     } catch (error) {
       console.error('Error fetching face data:', error)
       setErrorMessage(error instanceof Error ? error.message : 'An unknown error occurred')
