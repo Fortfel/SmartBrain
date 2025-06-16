@@ -1,3 +1,4 @@
+import type { Request, Response } from 'express'
 import type { Prisma } from '@prisma/client'
 
 /**
@@ -5,6 +6,7 @@ import type { Prisma } from '@prisma/client'
  */
 export type AppRequest = Request & {
   // Add any custom properties you might need
+  user?: SafeUser
 }
 
 /**
@@ -24,6 +26,7 @@ export type User = {
   passwordHash: string
   entries: number
   joined: Date
+  isAuthorized: boolean
 }
 
 /**
@@ -55,4 +58,14 @@ export type EntriesUpdateRequestBody = {
   id: number
   imageUrl: string
   detectionResults: Prisma.InputJsonValue
+}
+
+/**
+ * Remaining API requests response structure
+ */
+export type RemainingRequestsResponse = {
+  remaining: number
+  used: number
+  limit: number
+  resetDay: number
 }

@@ -39,6 +39,7 @@ const handleLogin = async (req: Request<object, object, LoginRequestBody>, res: 
         passwordHash: true,
         entries: true,
         joined: true,
+        isAuthorized: true,
       },
     })
 

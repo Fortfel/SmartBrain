@@ -10,6 +10,8 @@ import { handleRegister } from './controllers/register.js'
 import { handleProfileGet } from './controllers/profile.js'
 import { handleEntriesUpdate } from './controllers/image.js'
 import { hanfleClarifaiRequest } from './controllers/clarifai.js'
+import { handleRemainingRequests } from './controllers/requests.js'
+import { checkAuthorization, checkRequestLimit, recordApiRequest } from './middleware/apiLimiter.js'
 
 // Load environment variables
 if (fs.existsSync('.env')) {
@@ -81,12 +83,22 @@ app.get('/api/profile/:id', handleProfileGet)
 
 app.put('/api/image', handleEntriesUpdate)
 
-app.post('/api/clarifai', hanfleClarifaiRequest)
+// Apply API limiting middleware to the Clarifai endpoint
+app.post(
+  '/api/clarifai',
+  checkAuthorization,
+  checkRequestLimit,
+  recordApiRequest('/api/clarifai'),
+  hanfleClarifaiRequest,
+)
+
+// Endpoint to check remaining API requests
+app.get('/api/requests/remaining', handleRemainingRequests)
 
 // For production: serve the static files from the Vite build
 if (process.env.NODE_ENV === 'production') {
   // Serve static files from the Vite build directory
-  const distPath = path.resolve(__dirname, '../dist')
+  const distPath = path.resolve(__dirname, '../app')
 
   app.use(express.static(distPath))
 

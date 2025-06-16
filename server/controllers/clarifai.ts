@@ -2,6 +2,7 @@
 import type { Request, Response } from 'express'
 // @ts-expect-error apparently ClarifaiStub isn't exported
 import { ClarifaiStub, grpc } from 'clarifai-nodejs-grpc'
+import { SafeUser } from '../types.js'
 
 export type BoundingBox = {
   top_row: number
@@ -83,7 +84,7 @@ const MODEL_VERSION_ID = '6dc7e46bc9124c5c8824be4822abe105'
 const stub = ClarifaiStub.grpc()
 
 const hanfleClarifaiRequest = async (
-  req: Request<object, object, ClarifaiRequestBody>,
+  req: Request<object, object, ClarifaiRequestBody> & { user?: SafeUser },
   res: Response,
 ): Promise<void> => {
   const { IMAGE_URL } = req.body
