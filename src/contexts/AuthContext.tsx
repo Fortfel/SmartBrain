@@ -1,5 +1,11 @@
 import * as React from 'react'
-import type { LoginRequestBody, RegisterRequestBody, EntriesUpdateRequestBody, SafeUser } from '@/../server/types'
+import type {
+  LoginRequestBody,
+  RegisterRequestBody,
+  EntriesUpdateRequestBody,
+  SafeUser,
+  RemainingRequestsResponse,
+} from '@/../server/types'
 import { AuthContext } from '@/contexts/use-auth.ts'
 
 export type LoginResponse = {
@@ -38,6 +44,7 @@ export type AuthContextType = {
   isLoading: boolean
   isAuthenticated: boolean
   isAuthorized: boolean
+  requestsRemaining: number | null
   login: (credentials: LoginRequestBody) => Promise<LoginResponse>
   register: (request: RegisterRequestBody) => Promise<RegisterResponse>
   logout: () => LogoutResponse
@@ -55,6 +62,7 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
   const [isLoading, setIsLoading] = React.useState<boolean>(true)
   const [isAuthenticated, setIsAuthenticated] = React.useState<boolean>(false)
   const [isAuthorized, setIsAuthorized] = React.useState<boolean>(false)
+  const [requestsRemaining, setRequestsRemaining] = React.useState<number | null>(null)
 
   // Store callbacks using useRef to persist across re-renders
   const loginCallbacksRef = React.useRef<Set<LoginCallback>>(new Set())
@@ -70,9 +78,11 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
 
         setUser(parsedUser)
         setIsAuthenticated(true)
+        setIsAuthorized(parsedUser.isAuthorized)
 
-        if (parsedUser.email === 'admin@email.com') {
-          setIsAuthorized(true)
+        // Fetch remaining requests if user is authorized
+        if (parsedUser.isAuthorized) {
+          void fetchRemainingRequests(parsedUser.id)
         }
       }
     } catch (error) {
@@ -83,6 +93,20 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
       setIsLoading(false)
     }
   }, [])
+
+  // Function to fetch remaining API requests
+  const fetchRemainingRequests = async (userId: number): Promise<void> => {
+    try {
+      const response = await fetch(`/api/requests/remaining?id=${userId.toString()}`)
+
+      if (response.ok) {
+        const data = (await response.json()) as RemainingRequestsResponse
+        setRequestsRemaining(data.remaining)
+      }
+    } catch (error) {
+      console.error('Error fetching remaining requests:', error)
+    }
+  }
 
   const onLogin = React.useCallback((callback: LoginCallback): UnsubscribeFunction | undefined => {
     if (typeof callback === 'function') {
@@ -157,9 +181,11 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
 
         setUser(userData)
         setIsAuthenticated(true)
+        setIsAuthorized(userData.isAuthorized)
 
-        if (userData.email === 'admin@email.com') {
-          setIsAuthorized(true)
+        // Fetch remaining requests if user is authorized
+        if (userData.isAuthorized) {
+          void fetchRemainingRequests(userData.id)
         }
 
         // Execute all registered login callbacks
@@ -212,10 +238,7 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
 
         setUser(userData)
         setIsAuthenticated(true)
-
-        if (userData.email === 'admin@email.com') {
-          setIsAuthorized(true)
-        }
+        setIsAuthorized(userData.isAuthorized)
 
         // Execute all login callbacks (since registration also logs the user in)
         executeLoginCallbacks(userData)
@@ -248,6 +271,7 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
       setUser(null)
       setIsAuthenticated(false)
       setIsAuthorized(false)
+      setRequestsRemaining(null)
 
       // Execute all logout callbacks
       executeLogoutCallbacks(user)
@@ -298,6 +322,11 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
 
         setUser(userData)
 
+        // Update remaining requests if user is authorized
+        if (userData.isAuthorized) {
+          void fetchRemainingRequests(userData.id)
+        }
+
         return {
           success: true,
           user: userData,
@@ -321,6 +350,7 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
       isLoading,
       isAuthenticated,
       isAuthorized,
+      requestsRemaining,
       login,
       register,
       logout,
@@ -328,7 +358,19 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
       onLogin,
       onLogout,
     }),
-    [user, isLoading, isAuthenticated, isAuthorized, login, register, logout, updateUserEntries, onLogin, onLogout],
+    [
+      user,
+      isLoading,
+      isAuthenticated,
+      isAuthorized,
+      requestsRemaining,
+      login,
+      register,
+      logout,
+      updateUserEntries,
+      onLogin,
+      onLogout,
+    ],
   )
 
   return <AuthContext value={contextValue}>{children}</AuthContext>

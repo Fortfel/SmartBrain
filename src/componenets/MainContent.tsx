@@ -48,7 +48,7 @@ const MainContent = (): React.JSX.Element => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ IMAGE_URL: inputValue }), // We can't use imageUrl directly here because it's not yet updated (async)
+        body: JSON.stringify({ id: user.id, IMAGE_URL: inputValue }), // We can't use imageUrl directly here because it's not yet updated (async)
       })
 
       if (!response.ok) {
