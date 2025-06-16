@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { ImageLinkForm } from '@/componenets/ImageLinkForm.tsx'
+import { ApiUsageIndicator } from '@/componenets/ApiUsageIndicator.tsx'
 import { type BoundingBox, FaceRecognition } from '@/componenets/FaceRecognition.tsx'
 import { type ErrorResponse, useAuth } from '@/contexts'
 import { type ProcessedBoundingBox } from '@/../server/controllers/clarifai.ts'
@@ -84,13 +85,14 @@ const MainContent = (): React.JSX.Element => {
     <main className="min-h-[600px] px-5 font-courier">
       <div className="mx-auto flex max-w-[var(--breakpoint-lg)] flex-col items-center gap-7">
         {user && (
-          <p className="text-center text-lg font-semibold">
-            <span className="text-secondary">{user.name}</span>, you used face recognition tool
-            <br />
-            <span className="text-secondary">{user.entries}</span> times total
-            <br />
-            and <span className="text-secondary">0/10</span> this month
-          </p>
+          <div className={'font-semibold'}>
+            <p className="text-center text-lg">
+              <span className="text-secondary">{user.name}</span>, you used face recognition tool
+              <br />
+              <span className="text-secondary">{user.entries}</span> times total
+            </p>
+            <ApiUsageIndicator />
+          </div>
         )}
         <ImageLinkForm
           inputValue={inputValue}
