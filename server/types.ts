@@ -1,20 +1,4 @@
-import type { Request, Response } from 'express'
 import type { Prisma } from '@prisma/client'
-
-/**
- * Extended Express Request with custom properties
- */
-export type AppRequest = Request & {
-  // Add any custom properties you might need
-  user?: SafeUser
-}
-
-/**
- * Extended Express Response with custom properties
- */
-export type AppResponse = Response & {
-  // Add any custom properties you might need
-}
 
 /**
  * User data structure

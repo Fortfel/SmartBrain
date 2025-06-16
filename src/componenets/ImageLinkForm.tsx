@@ -14,7 +14,7 @@ const ImageLinkForm = ({
   onPictureSubmit,
   isLoading,
 }: ImageLinkFormProps): React.JSX.Element => {
-  const { user } = useAuth()
+  const { user, isAuthorized } = useAuth()
 
   const inputRef = React.useRef<HTMLInputElement>(null)
 
@@ -56,7 +56,7 @@ const ImageLinkForm = ({
           type="submit"
           className="btn join-item btn-lg btn-secondary"
           onClick={handleButtonClick}
-          disabled={isLoading || !user}
+          disabled={isLoading || !user || !isAuthorized}
         >
           {isLoading ? (
             <>

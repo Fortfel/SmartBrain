@@ -18,7 +18,7 @@ type FaceRecognitionProps = {
 }
 
 const FaceRecognition = ({ imageUrl, errorMessage, faceRegions }: FaceRecognitionProps): React.JSX.Element => {
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, isAuthorized } = useAuth()
 
   return (
     <div className="flex w-full flex-col items-center">
@@ -71,6 +71,26 @@ const FaceRecognition = ({ imageUrl, errorMessage, faceRegions }: FaceRecognitio
               })}
             </div>
           )}
+        </div>
+      )}
+      {isAuthenticated && !isAuthorized && (
+        <div className="alert-soft mb-2 alert w-full max-w-lg alert-warning">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            className="h-6 w-6 shrink-0 stroke-current"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            ></path>
+          </svg>
+          <span>
+            You have to be <strong>authorized</strong> to use this feature.
+          </span>
         </div>
       )}
       {!isAuthenticated && (

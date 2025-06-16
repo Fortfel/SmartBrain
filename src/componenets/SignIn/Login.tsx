@@ -25,6 +25,24 @@ const Login = ({ onSuccess }: LoginProps): React.JSX.Element => {
   return (
     <>
       {formState && formState.error && <div className="mb-2 alert alert-error">{formState.error}</div>}
+      <div className="alert-soft mb-2 alert w-full max-w-lg alert-info">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          className="h-6 w-6 shrink-0 stroke-current"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          ></path>
+        </svg>
+        <span>
+          Test credentials: <b>admin@email.com</b> / <b>admin</b>
+        </span>
+      </div>
       <form action={formAction}>
         <fieldset className="fieldset space-y-1">
           <div>
