@@ -27,13 +27,22 @@ export default defineConfig({
     legacy({
       // targets: ['defaults', 'not IE 11'], // its in browserlist option in packgae.json
     }),
-    VitePluginBrowserSync(),
+    VitePluginBrowserSync({
+      dev: {
+        bs: {
+          port: 3001,
+        },
+      },
+    }),
   ],
+  build: {
+    outDir: 'dist/app',
+  },
   server: {
     proxy: {
       // Proxy API requests to the Express server during development
       '/api': {
-        target: `http://localhost:${serverPort}`,
+        target: `http://localhost:${serverPort.toString()}`,
         changeOrigin: true,
         secure: false,
       },
