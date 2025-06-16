@@ -21,8 +21,10 @@ model User {
   passwordHash String        @map("password_hash")
   entries      Int           @default(0)
   joined       DateTime      @default(now())
+  isAuthorized Boolean       @default(false) @map("is_authorized")
   loginHistory LoginHistory[]
   imageEntries ImageEntry[]
+  apiRequests  ApiRequest[]
 
   @@map("users")
 }
@@ -47,4 +49,14 @@ model ImageEntry {
   user             User     @relation(fields: [userId], references: [id])
 
   @@map("image_entries")
+}
+
+model ApiRequest {
+  id          Int      @id @default(autoincrement())
+  userId      Int      @map("user_id")
+  requestedAt DateTime @default(now()) @map("requested_at")
+  endpoint    String
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@map("api_requests")
 }
