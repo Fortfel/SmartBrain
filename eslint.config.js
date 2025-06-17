@@ -12,7 +12,7 @@ import reactDom from 'eslint-plugin-react-dom'
 import reactCompiler from 'eslint-plugin-react-compiler'
 
 export default tseslint.config(
-  { ignores: ['dist'] },
+  { ignores: ['dist', 'backend/prisma/seed.ts'] },
   js.configs.recommended,
   ...tseslint.configs.recommendedTypeChecked,
   ...tseslint.configs.strictTypeChecked,
@@ -116,7 +116,7 @@ export default tseslint.config(
   },
   {
     // Override for specific files
-    files: ['src/assets/**/*', 'server/**/*'],
+    files: ['frontend/src/assets/**/*', 'backend/server/**/*'],
     rules: {
       'import/no-default-export': 'off',
     },

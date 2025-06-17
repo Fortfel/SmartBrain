@@ -23,12 +23,12 @@
   .hero-background {
     @apply absolute opacity-60 inset-0 -top-[100px] max-h-[1000px] -z-2 transition duration-500;
 
-    background: url('/src/assets/img/noise.png'), radial-gradient(circle at top right, #b894f6, #9f93e8 25%, #8da9f4, #7abeec 65%, #a8d8f280);
+    background: url('/frontend/src/assets/img/noise.png'), radial-gradient(circle at top right, #b894f6, #9f93e8 25%, #8da9f4, #7abeec 65%, #a8d8f280);
     mask-image: radial-gradient(ellipse 120% 40% at center 35%, #000 10%, #00000080 50%, #0000);
     mask-composite: intersect;
 
     @variant dark {
-      background: url('/src/assets/img/noise.png'), radial-gradient(circle at top center, #8e2de2, #563277 25%, #4a378c, #4066a8 65%, #32517380);
+      background: url('/frontend/src/assets/img/noise.png'), radial-gradient(circle at top center, #8e2de2, #563277 25%, #4a378c, #4066a8 65%, #32517380);
       mask-image: radial-gradient(ellipse 150% 35% at center center, #000 20%, #00000080 50%, #0000);
     }
     @variant xl {

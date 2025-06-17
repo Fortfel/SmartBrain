@@ -8,12 +8,12 @@ import VitePluginBrowserSync from 'vite-plugin-browser-sync'
 import dotenv from 'dotenv'
 
 // Load environment variables
-if (fs.existsSync('.env')) {
-  dotenv.config({ path: '.env' })
+if (fs.existsSync('./../.env')) {
+  dotenv.config({ path: './../.env' })
 }
 
-if (fs.existsSync('.env.local')) {
-  dotenv.config({ path: '.env.local', override: true })
+if (fs.existsSync('./../.env.local')) {
+  dotenv.config({ path: './../.env.local', override: true })
 }
 const serverPort = process.env.PORT || 3000
 
@@ -23,7 +23,10 @@ export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
-    tsconfigPaths(),
+    tsconfigPaths({
+      root: '../',
+      projects: ['tsconfig.app.json'],
+    }),
     legacy({
       // targets: ['defaults', 'not IE 11'], // its in browserlist option in packgae.json
     }),

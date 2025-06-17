@@ -1,0 +1,53 @@
+{
+  "name": "smartbrain-frontend",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "author": "https://twitter.com/Fortel91",
+  "description": "Frontend for SmartBrain application built with React, TypeScript, and Tailwind",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit -p ../tsconfig.app.json && vite build",
+    "preview": "vite preview",
+    "type-check": "tsc --noEmit -p ../tsconfig.app.json"
+  },
+  "dependencies": {
+    "@tsparticles/engine": "^3.8.1",
+    "@tsparticles/plugin-polygon-mask": "^3.8.1",
+    "@tsparticles/react": "^3.0.0",
+    "@tsparticles/slim": "^3.8.1",
+    "clsx": "^2.1.1",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-parallax-tilt": "^1.7.294"
+  },
+  "devDependencies": {
+    "@tailwindcss/forms": "^0.5.10",
+    "@tailwindcss/typography": "^0.5.16",
+    "@tailwindcss/vite": "^4.1.4",
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.2",
+    "@vitejs/plugin-legacy": "^6.1.0",
+    "@vitejs/plugin-react-swc": "^3.9.0",
+    "browser-sync": "^3.0.4",
+    "daisyui": "^5.0.35",
+    "dotenv": "^16.5.0",
+    "tailwindcss": "^4.1.4",
+    "vite": "^6.3.3",
+    "vite-plugin-browser-sync": "^4.0.0",
+    "vite-tsconfig-paths": "^5.1.4"
+  },
+  "typedocOptions": {
+    "entryPoints": [
+      "main.tsx",
+      "utils/index.ts"
+    ],
+    "out": "../docs",
+    "tsconfig": "../tsconfig.json",
+    "includeVersion": true,
+    "readme": "../README.md"
+  },
+  "browserslist": [
+    "defaults"
+  ]
+}

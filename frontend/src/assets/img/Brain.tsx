@@ -1,5 +1,6 @@
 import * as React from 'react'
 
+// eslint-disable-next-line
 interface SvgBrainProps extends React.SVGProps<SVGSVGElement> {}
 
 const SvgBrain = (props: SvgBrainProps): React.JSX.Element => (

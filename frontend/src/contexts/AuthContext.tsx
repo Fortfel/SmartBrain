@@ -5,7 +5,7 @@ import type {
   EntriesUpdateRequestBody,
   SafeUser,
   RemainingRequestsResponse,
-} from '@/../server/types'
+} from '@/../../backend/server/types'
 import { AuthContext } from '@/contexts/use-auth.ts'
 
 export type LoginResponse = {

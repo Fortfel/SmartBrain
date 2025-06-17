@@ -14,12 +14,12 @@ import { handleRemainingRequests } from './controllers/requests.js'
 import { checkAuthorization, checkRequestLimit, recordApiRequest } from './middleware/apiLimiter.js'
 
 // Load environment variables
-if (fs.existsSync('.env')) {
-  dotenv.config({ path: '.env' })
+if (fs.existsSync('./../.env')) {
+  dotenv.config({ path: './../.env' })
 }
 
-if (fs.existsSync('.env.local')) {
-  dotenv.config({ path: '.env.local', override: true })
+if (fs.existsSync('./../.env.local')) {
+  dotenv.config({ path: './../.env.local', override: true })
 }
 
 const __filename = fileURLToPath(import.meta.url)

@@ -4,8 +4,12 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "esModuleInterop": true,
-    "outDir": "./dist/server",
-    "rootDir": "./server",
+    "outDir": "./dist/backend",
+    "rootDir": "./backend",
+//    "baseUrl": "./backend" /* Specify the base directory to resolve non-relative module names. */,
+//    "paths": {
+//      "@/*": ["./server/*"]
+//    },
     "strict": true,
     "sourceMap": true,
     "declaration": false,
@@ -18,6 +22,6 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["server/**/*.ts"],
+  "include": ["backend/server/**/*.ts"],
   "exclude": ["node_modules"]
 }

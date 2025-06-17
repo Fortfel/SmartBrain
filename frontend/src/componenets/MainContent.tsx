@@ -3,7 +3,7 @@ import { ImageLinkForm } from '@/componenets/ImageLinkForm.tsx'
 import { ApiUsageIndicator } from '@/componenets/ApiUsageIndicator.tsx'
 import { type BoundingBox, FaceRecognition } from '@/componenets/FaceRecognition.tsx'
 import { type ErrorResponse, useAuth } from '@/contexts'
-import { type ProcessedBoundingBox } from '@/../server/controllers/clarifai.ts'
+import { type ProcessedBoundingBox } from '@/../../backend/server/controllers/clarifai.ts'
 
 const MainContent = (): React.JSX.Element => {
   const [inputValue, setInputValue] = React.useState('') //https://samples.clarifai.com/metro-north.jpg

@@ -10,7 +10,6 @@ type ApiUsageIndicatorProps = {
  */
 const ApiUsageIndicator = ({ className = '' }: ApiUsageIndicatorProps): React.JSX.Element | null => {
   const { isAuthenticated, isAuthorized, requestsRemaining } = useAuth()
-  console.log(requestsRemaining)
 
   // Don't show anything if user is not authenticated or not authorized
   if (!isAuthenticated || !isAuthorized) {
