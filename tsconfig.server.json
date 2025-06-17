@@ -4,9 +4,9 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "esModuleInterop": true,
-    "outDir": "./dist/backend",
-    "rootDir": "./backend",
-//    "baseUrl": "./backend" /* Specify the base directory to resolve non-relative module names. */,
+    "outDir": "./dist",
+    "rootDir": ".",
+    "baseUrl": "./backend" /* Specify the base directory to resolve non-relative module names. */,
 //    "paths": {
 //      "@/*": ["./server/*"]
 //    },

@@ -98,7 +98,7 @@ app.get('/api/requests/remaining', handleRemainingRequests)
 // For production: serve the static files from the Vite build
 if (process.env.NODE_ENV === 'production') {
   // Serve static files from the Vite build directory
-  const distPath = path.resolve(__dirname, '../app')
+  const distPath = path.resolve(__dirname, '../../frontend')
 
   app.use(express.static(distPath))
 

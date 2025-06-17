@@ -20,11 +20,9 @@
     "start:backend": "npm run start --workspace=backend",
     "lint": "eslint ./**/*.{ts,tsx}",
     "lint:fix": "eslint ./**/*.{ts,tsx} --fix",
-
     "type-check": "npm-run-all type-check:*",
     "type-check:frontend": "npm run type-check --workspace=frontend",
     "type-check:backend": "npm run type-check --workspace=backend",
-
     "prisma:migrate": "npm run prisma:migrate --workspace=backend",
     "prisma:migrate:reset": "npm run prisma:migrate:reset --workspace=backend",
     "prisma:generate": "npm run prisma:generate --workspace=backend",
