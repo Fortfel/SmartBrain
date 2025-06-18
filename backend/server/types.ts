@@ -41,7 +41,7 @@ export type RegisterRequestBody = {
 export type EntriesUpdateRequestBody = {
   id: number
   imageUrl: string
-  detectionResults: Prisma.InputJsonValue
+  detectionResults?: Prisma.InputJsonValue
 }
 
 /**

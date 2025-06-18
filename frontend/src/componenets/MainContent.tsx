@@ -45,6 +45,7 @@ const MainContent = (): React.JSX.Element => {
     setErrorMessage('')
     setIsLoading(true)
     setImageUrl(inputValue)
+    setfaceRegions([])
 
     try {
       const response = await fetch(API_URL + '/api/clarifai', {
@@ -58,6 +59,14 @@ const MainContent = (): React.JSX.Element => {
       if (!response.ok) {
         const errrorData = (await response.json()) as ErrorResponse
         setErrorMessage(errrorData.error || 'Failed to process image')
+
+        // Update user entries
+        await updateUserEntries({
+          id: user.id,
+          imageUrl: inputValue,
+          detectionResults: [],
+        })
+
         return
       }
 
