@@ -19,36 +19,40 @@ const serverPort = process.env.PORT || 3000
 
 // https://vite.dev/config/
 // eslint-disable-next-line import/no-default-export
-export default defineConfig({
-  plugins: [
-    react(),
-    tailwindcss(),
-    tsconfigPaths({
-      root: '../',
-      projects: ['tsconfig.app.json'],
-    }),
-    legacy({
-      // targets: ['defaults', 'not IE 11'], // its in browserlist option in packgae.json
-    }),
-    VitePluginBrowserSync({
-      dev: {
-        bs: {
-          port: 3001,
+export default defineConfig(({ mode }) => {
+  return {
+    plugins: [
+      react(),
+      tailwindcss(),
+      tsconfigPaths({
+        root: '../',
+        projects: ['tsconfig.app.json'],
+      }),
+      legacy({
+        // targets: ['defaults', 'not IE 11'], // its in browserlist option in packgae.json
+      }),
+      VitePluginBrowserSync({
+        dev: {
+          bs: {
+            port: Number(serverPort) + 1,
+          },
         },
-      },
-    }),
-  ],
-  build: {
-    outDir: '../dist/frontend',
-  },
-  server: {
-    proxy: {
-      // Proxy API requests to the Express server during development
-      '/api': {
-        target: `http://localhost:${serverPort.toString()}`,
-        changeOrigin: true,
-        secure: false,
-      },
+      }),
+    ],
+    build: {
+      outDir: '../dist/frontend',
     },
-  },
+    server: {
+      ...(mode === 'development' && {
+        proxy: {
+          // Proxy API requests to the Express server during development
+          '/api': {
+            target: `http://localhost:${serverPort.toString()}`,
+            changeOrigin: true,
+            secure: false,
+          },
+        },
+      }),
+    },
+  }
 })

@@ -7,6 +7,7 @@ import type {
   RemainingRequestsResponse,
 } from '@backend/server/types'
 import { AuthContext } from '@/contexts/use-auth.ts'
+import { API_BASE_URL } from '@/utils/api.ts'
 
 export type LoginResponse = {
   success: boolean
@@ -57,6 +58,8 @@ export type AuthProviderProps = {
   children: React.ReactNode
 }
 
+const API_URL = API_BASE_URL
+
 const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
   const [user, setUser] = React.useState<SafeUser | null>(null)
   const [isLoading, setIsLoading] = React.useState<boolean>(true)
@@ -97,7 +100,7 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
   // Function to fetch remaining API requests
   const fetchRemainingRequests = async (userId: number): Promise<void> => {
     try {
-      const response = await fetch(`/api/requests/remaining?id=${userId.toString()}`)
+      const response = await fetch(`${API_URL}/api/requests/remaining?id=${userId.toString()}`)
 
       if (response.ok) {
         const data = (await response.json()) as RemainingRequestsResponse
@@ -157,7 +160,7 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
       try {
         setIsLoading(true)
 
-        const response = await fetch('/api/login', {
+        const response = await fetch(API_URL + '/api/login', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -214,7 +217,7 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
       try {
         setIsLoading(true)
 
-        const response = await fetch('/api/register', {
+        const response = await fetch(API_URL + '/api/register', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -294,7 +297,7 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
   const updateUserEntries = React.useCallback(
     async ({ id, imageUrl, detectionResults }: EntriesUpdateRequestBody): Promise<ImageEntryResponse> => {
       try {
-        const response = await fetch('/api/image', {
+        const response = await fetch(API_URL + '/api/image', {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',

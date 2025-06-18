@@ -4,6 +4,9 @@ import { ApiUsageIndicator } from '@/componenets/ApiUsageIndicator.tsx'
 import { type BoundingBox, FaceRecognition } from '@/componenets/FaceRecognition.tsx'
 import { type ErrorResponse, useAuth } from '@/contexts'
 import type { ProcessedBoundingBox } from '@backend/server/controllers/clarifai'
+import { API_BASE_URL } from '@/utils/api.ts'
+
+const API_URL = API_BASE_URL
 
 const MainContent = (): React.JSX.Element => {
   const [inputValue, setInputValue] = React.useState('') //https://samples.clarifai.com/metro-north.jpg
@@ -44,7 +47,7 @@ const MainContent = (): React.JSX.Element => {
     setImageUrl(inputValue)
 
     try {
-      const response = await fetch('/api/clarifai', {
+      const response = await fetch(API_URL + '/api/clarifai', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
