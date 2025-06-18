@@ -1,9 +1,12 @@
-import express, { type Request, type Response } from 'express'
+import express, { type Request, type Response, type NextFunction } from 'express'
 import path from 'node:path'
 import fs from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import argon2 from 'argon2'
 import dotenv from 'dotenv'
+import cors from 'cors'
+import rateLimit from 'express-rate-limit'
+import helmet from 'helmet'
 import prisma from './prisma.js'
 import { handleLogin } from './controllers/login.js'
 import { handleRegister } from './controllers/register.js'
@@ -52,6 +55,54 @@ export async function verifyPassword(hash: string, password: string): Promise<bo
 }
 
 const app = express()
+
+// SECURITY
+const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',')
+if (!allowedOrigins) {
+  throw new Error('ALLOWED_ORIGINS environment variable is required')
+}
+
+// Security middleware
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+  }),
+)
+
+// CORS middleware
+const corsOptions = {
+  origin: allowedOrigins,
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true,
+  optionsSuccessStatus: 200,
+}
+app.use(cors(corsOptions))
+
+// Rate limiting middleware
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  limit: 100, // Limit each IP to 100 requests per windowMs
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  message: 'Too many requests, please try again later.',
+})
+app.use(limiter)
+
+// Referer middleware
+app.use((req: Request, res: Response, next: NextFunction) => {
+  const referer = req.get('Referer')
+  const origin = req.get('Origin')
+
+  const isValidReferer = referer && allowedOrigins.some((allowed) => referer.startsWith(allowed))
+  const isValidOrigin = origin && allowedOrigins.includes(origin)
+
+  if (!isValidReferer && !isValidOrigin) {
+    res.status(403).json({ error: 'Forbidden: Invalid origin' })
+    return
+  }
+
+  next()
+})
 
 // Middleware
 app.use(express.json())
