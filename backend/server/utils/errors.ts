@@ -21,8 +21,13 @@ export class AppError extends Error {
  * Error for invalid user input
  */
 export class ValidationError extends AppError {
-  constructor(message: string) {
+  readonly field?: string
+  readonly code?: string
+
+  constructor(message: string, field?: string, code?: string) {
     super(message, 400)
+    this.field = field
+    this.code = code
   }
 }
 
@@ -54,6 +59,15 @@ export class NotFoundError extends AppError {
 }
 
 /**
+ * Error for conflicts (e.g., duplicate resources)
+ */
+export class ConflictError extends AppError {
+  constructor(message: string) {
+    super(message, 409)
+  }
+}
+
+/**
  * Error for rate limiting
  */
 export class RateLimitError extends AppError {
@@ -68,29 +82,101 @@ export class RateLimitError extends AppError {
 }
 
 /**
+ * Interface for error response
+ */
+type ErrorResponse = {
+  error: string
+  statusCode: number
+  timestamp: string
+  path?: string
+  field?: string
+  code?: string
+  limit?: number
+  reset?: string
+}
+
+/**
  * Global error handler middleware
  */
-export const errorHandler = (err: unknown, _req: Request, res: Response, _next: NextFunction): void => {
+export const errorHandler = (err: unknown, req: Request, res: Response, _next: NextFunction): void => {
   // Default error values
   let statusCode = 500
   let message = 'Internal server error'
   let isOperational = false
+  let field: string | undefined
+  let code: string | undefined
+  let limit: number | undefined
+  let reset: string | undefined
 
   // Handle known errors
   if (err instanceof AppError) {
     statusCode = err.statusCode
     message = err.message
     isOperational = err.isOperational
+
+    // Handle specific error types
+    if (err instanceof ValidationError) {
+      field = err.field
+      code = err.code
+    } else if (err instanceof RateLimitError) {
+      limit = err.limit
+      reset = err.reset.toISOString()
+    }
   } else if (err instanceof Error) {
     message = err.message
   }
 
-  // Log error
-  console.error(`[ERROR] ${statusCode.toString()}: ${message}`, err)
+  // Log error with more context
+  const logMessage = `[ERROR] ${statusCode.toString()} - ${message}`
+  const logContext = {
+    method: req.method,
+    url: req.url,
+    ip: req.ip,
+    userAgent: req.get('User-Agent'),
+    stack: err instanceof Error ? err.stack : undefined,
+  }
+
+  if (statusCode >= 500) {
+    console.error(logMessage, logContext)
+  } else {
+    console.warn(logMessage, { method: req.method, url: req.url })
+  }
+
+  // Build error response
+  const errorResponse: ErrorResponse = {
+    error: message,
+    statusCode,
+    timestamp: new Date().toISOString(),
+    path: req.path,
+  }
+
+  // Add optional fields
+  if (field) errorResponse.field = field
+  if (code) errorResponse.code = code
+  if (limit) errorResponse.limit = limit
+  if (reset) errorResponse.reset = reset
+
+  // Don't expose internal server errors in production
+  if (!isOperational && process.env.NODE_ENV === 'production') {
+    errorResponse.error = 'Internal server error'
+  }
 
   // Send response
-  res.status(statusCode).json({
-    error: message,
-    ...(isOperational ? {} : { details: 'An unexpected error occurred' }),
-  })
+  res.status(statusCode).json(errorResponse)
+}
+
+/**
+ * Async error wrapper - catches async errors and forwards to error handler
+ */
+export const asyncHandler = (fn: (req: Request, res: Response, next: NextFunction) => Promise<unknown>) => {
+  return (req: Request, res: Response, next: NextFunction): void => {
+    Promise.resolve(fn(req, res, next)).catch(next)
+  }
+}
+
+/**
+ * 404 handler middleware - should be used after all routes
+ */
+export const notFoundHandler = (req: Request, _res: Response, next: NextFunction): void => {
+  next(new NotFoundError(`Route ${req.originalUrl}`))
 }
