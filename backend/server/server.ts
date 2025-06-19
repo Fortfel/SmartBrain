@@ -1,34 +1,19 @@
 import express, { type Request, type Response, type NextFunction } from 'express'
-import path from 'node:path'
-import fs from 'node:fs'
-import { fileURLToPath } from 'node:url'
 import argon2 from 'argon2'
-import dotenv from 'dotenv'
 import cors from 'cors'
 import rateLimit from 'express-rate-limit'
 import helmet from 'helmet'
-import prisma from './prisma.js'
+
+import { config } from './config.js'
+import { prismaService } from './prisma.js'
+import { errorHandler, notFoundHandler } from './utils/errors.js'
 import { handleLogin } from './controllers/login.js'
 import { handleRegister } from './controllers/register.js'
 import { handleProfileGet } from './controllers/profile.js'
 import { handleEntriesUpdate } from './controllers/image.js'
-import { hanfleClarifaiRequest } from './controllers/clarifai.js'
+import { handleClarifaiRequest } from './controllers/clarifai.js'
 import { handleRemainingRequests } from './controllers/requests.js'
 import { checkAuthorization, checkRequestLimit, recordApiRequest } from './middleware/apiLimiter.js'
-
-// Load environment variables
-if (fs.existsSync('./../.env')) {
-  dotenv.config({ path: './../.env' })
-}
-
-if (fs.existsSync('./../.env.local')) {
-  dotenv.config({ path: './../.env.local', override: true })
-}
-
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
-
-const PORT = process.env.PORT || 3000
 
 /**
  * Hashes a password using argon2id algorithm
@@ -38,9 +23,9 @@ const PORT = process.env.PORT || 3000
 export async function hashPassword(password: string): Promise<string> {
   return await argon2.hash(password, {
     type: argon2.argon2id,
-    memoryCost: 2 ** 16, // 64 MiB
-    timeCost: 3, // 3 iterations
-    parallelism: 1, // 1 degree of parallelism
+    memoryCost: config.password.memoryCost,
+    timeCost: config.password.timeCost,
+    parallelism: config.password.parallelism,
   })
 }
 
@@ -56,12 +41,6 @@ export async function verifyPassword(hash: string, password: string): Promise<bo
 
 const app = express()
 
-// SECURITY
-const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',')
-if (!allowedOrigins) {
-  throw new Error('ALLOWED_ORIGINS environment variable is required')
-}
-
 // Security middleware
 app.use(
   helmet({
@@ -71,7 +50,7 @@ app.use(
 
 // CORS middleware
 const corsOptions = {
-  origin: allowedOrigins,
+  origin: config.security.allowedOrigins,
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   credentials: true,
   optionsSuccessStatus: 200,
@@ -80,8 +59,8 @@ app.use(cors(corsOptions))
 
 // Rate limiting middleware
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  limit: 100, // Limit each IP to 100 requests per windowMs
+  windowMs: config.security.rateLimit.windowMs,
+  limit: config.security.rateLimit.limit,
   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
   message: 'Too many requests, please try again later.',
@@ -93,8 +72,8 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   const referer = req.get('Referer')
   const origin = req.get('Origin')
 
-  const isValidReferer = referer && allowedOrigins.some((allowed) => referer.startsWith(allowed))
-  const isValidOrigin = origin && allowedOrigins.includes(origin)
+  const isValidReferer = referer && config.security.allowedOrigins.some((allowed) => referer.startsWith(allowed))
+  const isValidOrigin = origin && config.security.allowedOrigins.includes(origin)
 
   if (!isValidReferer && !isValidOrigin) {
     res.status(403).json({ error: 'Forbidden: Invalid origin' })
@@ -104,13 +83,13 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   next()
 })
 
-// Middleware
+// Body parsing middleware
 app.use(express.json())
 
 // API Routes
-app.get('/api', async (_req: Request, res: Response): Promise<void> => {
+app.get('/api', async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const users = await prisma.user.findMany({
+    const users = await prismaService.prisma.user.findMany({
       select: {
         id: true,
         name: true,
@@ -121,8 +100,7 @@ app.get('/api', async (_req: Request, res: Response): Promise<void> => {
     })
     res.json(users)
   } catch (err) {
-    console.error('Error fetching users:', err)
-    res.status(500).json({ error: 'Error fetching users' })
+    next(err)
   }
 })
 
@@ -140,39 +118,75 @@ app.post(
   checkAuthorization,
   checkRequestLimit,
   recordApiRequest('/api/clarifai'),
-  hanfleClarifaiRequest,
+  handleClarifaiRequest,
 )
 
 // Endpoint to check remaining API requests
 app.get('/api/requests/remaining', handleRemainingRequests)
 
 // For production: serve the static files from the Vite build
-if (process.env.NODE_ENV === 'production') {
+if (config.server.nodeEnv === 'production') {
   // Serve static files from the Vite build directory
-  const distPath = path.resolve(__dirname, '../../frontend')
-
-  app.use(express.static(distPath))
+  app.use(express.static(config.server.distPath))
 
   // Catch-all handler: send back index.html for any non-API routes
   app.get('/*name', (_req: Request, res: Response): void => {
-    res.sendFile(path.join(distPath, 'index.html'))
+    res.sendFile(`${config.server.distPath}/index.html`)
   })
 }
+
+// 404 handler middleware
+app.use(notFoundHandler)
+
+// Global error handler
+app.use(errorHandler)
 
 // Connect to the database and start the server
 async function startServer(): Promise<void> {
   try {
     // Test database connection
-    await prisma.$connect()
-    console.log('Connected to the database successfully')
+    await prismaService.connect()
 
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT.toString()}`)
+    app.listen(config.server.port, () => {
+      console.log(`Server running on port ${config.server.port.toString()}`)
     })
   } catch (error) {
-    console.error('Failed to connect to the database:', error)
+    console.error('Failed to start server:', error)
     process.exit(1)
   }
 }
+
+// Handle graceful shutdown
+process.on('SIGINT', () => {
+  console.log('Received SIGINT. Shutting down gracefully...')
+
+  prismaService
+    .disconnect()
+    .then(() => {
+      console.log('Database connections closed')
+      console.log('Graceful shutdown completed')
+      process.exit(0)
+    })
+    .catch((error: unknown) => {
+      console.error('Error during graceful shutdown:', error)
+      process.exit(1)
+    })
+})
+
+process.on('SIGTERM', () => {
+  console.log('Received SIGTERM. Shutting down gracefully...')
+
+  prismaService
+    .disconnect()
+    .then(() => {
+      console.log('Database connections closed')
+      console.log('Graceful shutdown completed')
+      process.exit(0)
+    })
+    .catch((error: unknown) => {
+      console.error('Error during graceful shutdown:', error)
+      process.exit(1)
+    })
+})
 
 void startServer()
