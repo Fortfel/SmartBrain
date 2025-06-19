@@ -1,25 +1,8 @@
 import type { Request, Response, NextFunction } from 'express'
 import prisma from '../prisma.js'
 import type { SafeUser } from '../types.js'
-import dotenv from 'dotenv'
-import fs from 'node:fs'
-
-// Load environment variables
-if (fs.existsSync('./../.env')) {
-  dotenv.config({ path: './../.env' })
-}
-
-if (fs.existsSync('./../.env.local')) {
-  dotenv.config({ path: './../.env.local', override: true })
-}
-
-/**
- * Configuration for API request limits
- */
-const API_LIMIT_CONFIG = {
-  maxRequestsPerMonth: parseInt(process.env.VITE_MAX_API_REQUESTS_PER_MONTH as string) || 20,
-  resetDay: 1, // Reset on the first day of each month
-}
+import { config } from '../config.js'
+import { AuthorizationError, NotFoundError, RateLimitError } from '../utils/errors.js'
 
 /**
  * Helper function to extract user ID from request
@@ -64,8 +47,7 @@ export const checkAuthorization = async (
     const userId = getUserIdFromRequest(req)
 
     if (!userId) {
-      res.status(401).json({ error: 'Unauthorized - User ID not provided' })
-      return
+      throw new AuthorizationError('Unauthorized - User ID not provided')
     }
 
     // Find user and check authorization status
@@ -73,26 +55,36 @@ export const checkAuthorization = async (
       where: { id: userId },
       select: {
         id: true,
+        name: true,
+        email: true,
+        entries: true,
+        joined: true,
         isAuthorized: true,
       },
     })
 
     if (!user) {
-      res.status(404).json({ error: 'User not found' })
-      return
+      throw new NotFoundError('User')
     }
 
     if (!user.isAuthorized) {
-      res.status(403).json({ error: 'Unauthorized - User does not have API access' })
-      return
+      throw new AuthorizationError('Unauthorized - User does not have API access')
     }
 
     // Store user in request for use in subsequent middleware
     req.user = user as SafeUser
     next()
   } catch (error) {
-    console.error('Authorization check error:', error)
-    res.status(500).json({ error: 'Internal server error' })
+    if (error instanceof Error) {
+      if (error instanceof AuthorizationError || error instanceof NotFoundError) {
+        res.status(error.statusCode).json({ error: error.message })
+      } else {
+        console.error('Authorization check error:', error)
+        res.status(500).json({ error: 'Internal server error' })
+      }
+    } else {
+      res.status(500).json({ error: 'Unknown error occurred' })
+    }
   }
 }
 
@@ -111,8 +103,7 @@ export const checkRequestLimit = async (
     const userId = getUserIdFromRequest(req)
 
     if (!userId) {
-      res.status(401).json({ error: 'Unauthorized - User ID not provided' })
-      return
+      throw new AuthorizationError('Unauthorized - User ID not provided')
     }
 
     // Get the current month and year
@@ -133,21 +124,29 @@ export const checkRequestLimit = async (
       },
     })
 
-    if (requestCount >= API_LIMIT_CONFIG.maxRequestsPerMonth) {
-      res.status(429).json({
-        error: 'Rate limit exceeded',
-        message: 'You have reached your monthly API request limit',
-        limit: API_LIMIT_CONFIG.maxRequestsPerMonth,
-        reset: new Date(currentYear, currentMonth + 1, API_LIMIT_CONFIG.resetDay),
-      })
-      return
+    const { maxRequestsPerMonth, resetDay } = config.api
+
+    if (requestCount >= maxRequestsPerMonth) {
+      const resetDate = new Date(currentYear, currentMonth + 1, resetDay)
+      throw new RateLimitError('You have reached your monthly API request limit', maxRequestsPerMonth, resetDate)
     }
 
     // If we get here, the user has not exceeded their limit
     next()
   } catch (error) {
-    console.error('Rate limit check error:', error)
-    res.status(500).json({ error: 'Internal server error' })
+    if (error instanceof RateLimitError) {
+      res.status(error.statusCode).json({
+        error: 'Rate limit exceeded',
+        message: error.message,
+        limit: error.limit,
+        reset: error.reset,
+      })
+    } else if (error instanceof AuthorizationError) {
+      res.status(error.statusCode).json({ error: error.message })
+    } else {
+      console.error('Rate limit check error:', error)
+      res.status(500).json({ error: 'Internal server error' })
+    }
   }
 }
 
