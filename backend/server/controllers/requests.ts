@@ -1,42 +1,33 @@
-import type { Request, Response } from 'express'
+import type { Request, Response, NextFunction } from 'express'
 import prisma from '../prisma.js'
-import dotenv from 'dotenv'
-import fs from 'node:fs'
-
-// Load environment variables
-if (fs.existsSync('./../.env')) {
-  dotenv.config({ path: './../.env' })
-}
-
-if (fs.existsSync('./../.env.local')) {
-  dotenv.config({ path: './../.env.local', override: true })
-}
-
-/**
- * Configuration for API request limits
- */
-const API_LIMIT_CONFIG = {
-  maxRequestsPerMonth: parseInt(process.env.VITE_MAX_API_REQUESTS_PER_MONTH as string) || 20,
-}
+import { config } from '../config.js'
+import { ValidationError, NotFoundError, AuthorizationError } from '../utils/errors.js'
+import { type RemainingRequestsResponse } from '../types.js'
 
 /**
  * Handles retrieving the remaining API requests for a user
  * @param req - Express request object
  * @param res - Express response object
+ * @param next - Express next function
  * @returns Promise resolving when the request count is retrieved
  */
-const handleRemainingRequests = async (req: Request, res: Response): Promise<void> => {
-  const userId = req.query.id
-
-  if (!userId || typeof userId !== 'string') {
-    res.status(400).json({ error: 'Missing or invalid user ID' })
-    return
-  }
-
+const handleRemainingRequests = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
+    const userId = req.query.id
+
+    if (!userId || typeof userId !== 'string') {
+      throw new ValidationError('Missing or invalid user ID')
+    }
+
+    const userIdNum = Number(userId)
+
+    if (isNaN(userIdNum)) {
+      throw new ValidationError('Invalid user ID format')
+    }
+
     // Check if user exists and is authorized
     const user = await prisma.user.findUnique({
-      where: { id: Number(userId) },
+      where: { id: userIdNum },
       select: {
         id: true,
         isAuthorized: true,
@@ -44,17 +35,11 @@ const handleRemainingRequests = async (req: Request, res: Response): Promise<voi
     })
 
     if (!user) {
-      res.status(404).json({ error: 'User not found' })
-      return
+      throw new NotFoundError('User')
     }
 
     if (!user.isAuthorized) {
-      res.status(403).json({
-        error: 'Unauthorized',
-        remaining: 0,
-        limit: API_LIMIT_CONFIG.maxRequestsPerMonth,
-      })
-      return
+      throw new AuthorizationError('User is not authorized for API access')
     }
 
     // Get the current month and year
@@ -68,24 +53,26 @@ const handleRemainingRequests = async (req: Request, res: Response): Promise<voi
     // Count API requests for the current month
     const requestCount = await prisma.apiRequest.count({
       where: {
-        userId: Number(userId),
+        userId: userIdNum,
         requestedAt: {
           gte: startOfMonth,
         },
       },
     })
 
-    const remaining = Math.max(0, API_LIMIT_CONFIG.maxRequestsPerMonth - requestCount)
+    const { maxRequestsPerMonth, resetDay } = config.api
+    const remaining = Math.max(0, maxRequestsPerMonth - requestCount)
 
-    res.json({
+    const response = {
       remaining,
       used: requestCount,
-      limit: API_LIMIT_CONFIG.maxRequestsPerMonth,
-      resetDate: new Date(currentYear, currentMonth + 1, 1),
-    })
+      limit: maxRequestsPerMonth,
+      resetDay,
+    } satisfies RemainingRequestsResponse
+
+    res.json(response)
   } catch (error) {
-    console.error('Error retrieving remaining requests:', error)
-    res.status(500).json({ error: 'Internal server error' })
+    next(error)
   }
 }
 

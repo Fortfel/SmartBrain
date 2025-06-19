@@ -1,12 +1,25 @@
-import type { Request, Response } from 'express'
+import type { Request, Response, NextFunction } from 'express'
 import prisma from '../prisma.js'
+import { NotFoundError } from '../utils/errors.js'
 
-const handleProfileGet = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
-  const { id } = req.params
-
+/**
+ * Handles fetching a user profile by ID
+ * @param req - Express request object
+ * @param res - Express response object
+ * @param next - Express next function
+ * @returns Promise resolving when profile fetch completes
+ */
+const handleProfileGet = async (req: Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> => {
   try {
+    const { id } = req.params
+    const userId = Number(id)
+
+    if (isNaN(userId)) {
+      throw new NotFoundError('User')
+    }
+
     const user = await prisma.user.findUnique({
-      where: { id: Number(id) },
+      where: { id: userId },
       select: {
         id: true,
         name: true,
@@ -16,14 +29,13 @@ const handleProfileGet = async (req: Request<{ id: string }>, res: Response): Pr
       },
     })
 
-    if (user) {
-      res.json(user)
-    } else {
-      res.status(404).json({ error: 'User not found' })
+    if (!user) {
+      throw new NotFoundError('User')
     }
-  } catch (err) {
-    console.error('Error fetching user:', err)
-    res.status(500).json({ error: 'Error fetching user' })
+
+    res.json(user)
+  } catch (error) {
+    next(error)
   }
 }
 
