@@ -6,22 +6,30 @@
     "esModuleInterop": true,
     "outDir": "./dist",
     "rootDir": ".",
-    "baseUrl": "./backend" /* Specify the base directory to resolve non-relative module names. */,
-//    "paths": {
-//      "@/*": ["./server/*"]
-//    },
+    "baseUrl": "./backend",
+    "paths": {
+      "@server/*": ["./server/*"],
+      "@utils/*": ["./server/utils/*"],
+      "@controllers/*": ["./server/controllers/*"],
+      "@middleware/*": ["./server/middleware/*"]
+    },
     "strict": true,
     "sourceMap": true,
     "declaration": false,
     "noImplicitAny": true,
     "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictPropertyInitialization": true,
+    "noImplicitThis": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false
   },
-  "include": ["backend/server/**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": ["backend/server/**/*.ts", "backend/prisma/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
 }
