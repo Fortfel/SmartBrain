@@ -1,6 +1,6 @@
 import * as React from 'react'
 import Brain from '@/assets/img/Brain.tsx'
-import { ThemeController } from '@/componenets/ThemeController.tsx'
+import { ThemeController } from '@/components/ThemeController.tsx'
 import { useAuth } from '@/contexts'
 
 export type NavigationProps = {

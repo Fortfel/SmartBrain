@@ -6,7 +6,7 @@ import type { Container, ISourceOptions } from '@tsparticles/engine'
 import { loadSlim } from '@tsparticles/slim'
 import { loadPolygonMaskPlugin } from '@tsparticles/plugin-polygon-mask'
 import { particlesOptionsPolygon } from '@/assets/particlesOptions.ts'
-import { Navigation, type NavigationProps } from '@/componenets/Navigation.tsx'
+import { Navigation, type NavigationProps } from '@/components/Navigation.tsx'
 import { useTheme } from '@/contexts'
 
 type HeaderProps = {

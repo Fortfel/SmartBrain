@@ -1,7 +1,7 @@
 import * as React from 'react'
 import SvgBrain from '@/assets/img/Brain.tsx'
-import { Login } from '@/componenets/SignIn/Login.tsx'
-import { Register } from '@/componenets/SignIn/Register.tsx'
+import { Login } from '@/components/SignIn/Login.tsx'
+import { Register } from '@/components/SignIn/Register.tsx'
 
 type SignInProps = {
   ref: React.RefObject<HTMLDialogElement | null>

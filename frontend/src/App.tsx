@@ -4,11 +4,10 @@ import Particles, { initParticlesEngine } from '@tsparticles/react'
 import type { Container, ISourceOptions } from '@tsparticles/engine'
 import { loadSlim } from '@tsparticles/slim'
 import { particlesOoptionsLinks } from '@/assets/particlesOptions.ts'
-import { Header } from '@/componenets/Header.tsx'
-import { MainContent } from '@/componenets/MainContent.tsx'
-import { SignIn } from '@/componenets/SignIn/SignIn.tsx'
-import { useTheme } from '@/contexts'
-import { useAuth } from '@/contexts'
+import { Header } from '@/components/Header.tsx'
+import { MainContent } from '@/components/MainContent.tsx'
+import { SignIn } from '@/components/SignIn/SignIn.tsx'
+import { useTheme, useAuth } from '@/contexts'
 
 // Configuration
 const BRAIN_ANIMATION_DURATION = 1.8 // in seconds
@@ -25,22 +24,25 @@ const App = (): React.JSX.Element => {
   const particlesOptionsWithTheme: ISourceOptions = particlesOoptionsLinks
 
   React.useEffect(() => {
-    initParticlesEngine(async (engine) => {
-      // await loadAll(engine)
-      // await loadFull(engine)
-      await loadSlim(engine)
-      // await loadBasic(engine)
-    })
-      .then(() => {
+    const initializeParticles = async (): Promise<void> => {
+      try {
+        await initParticlesEngine(async (engine) => {
+          // await loadAll(engine)
+          // await loadFull(engine)
+          await loadSlim(engine)
+          // await loadBasic(engine)
+        })
         setAreParticlesLoaded(true)
-      })
-      .catch((e: unknown) => {
-        console.error(e)
-      })
+      } catch (error) {
+        console.error('Failed to initialize particles engine:', error)
+      }
+    }
+
+    void initializeParticles()
   }, [])
 
   const handleParticlesLoaded = React.useCallback(
-    async (container?: Container) => {
+    async (container?: Container): Promise<void> => {
       await container?.loadTheme(theme)
     },
     [theme],
@@ -59,8 +61,6 @@ const App = (): React.JSX.Element => {
       isDarkMode,
     'bg-[linear-gradient(to_right,#8080801F_1px,transparent_1px),linear-gradient(to_bottom,#8080801F_1px,transparent_1px)]':
       !isDarkMode,
-
-    // mask
     'mask-t-to-[calc(100%-200px)]': true,
   })
 
@@ -73,7 +73,7 @@ const App = (): React.JSX.Element => {
           options={particlesOptionsWithTheme}
         />
       )}
-      <div className={'relative flex min-h-dvh flex-col gap-15 overflow-x-hidden'}>
+      <div className="relative flex min-h-dvh flex-col gap-15 overflow-x-hidden">
         <div className={heroBackgroundGrid}></div>
         <div className="hero-background"></div>
         <Header brainAnimationDuration={BRAIN_ANIMATION_DURATION} onSignInClick={handleSignInClick} />
