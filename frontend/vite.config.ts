@@ -18,7 +18,6 @@ if (fs.existsSync('./../.env.local')) {
 const serverPort = process.env.PORT || 3000
 
 // https://vite.dev/config/
-// eslint-disable-next-line import/no-default-export
 export default defineConfig(({ mode }) => {
   return {
     plugins: [
@@ -41,6 +40,7 @@ export default defineConfig(({ mode }) => {
     ],
     build: {
       outDir: '../dist/frontend',
+      emptyOutDir: true,
     },
     server: {
       ...(mode === 'development' && {

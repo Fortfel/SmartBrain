@@ -116,7 +116,7 @@ export default tseslint.config(
   },
   {
     // Override for specific files
-    files: ['frontend/src/assets/**/*', 'backend/server/**/*'],
+    files: ['frontend/src/assets/**/*', 'frontend/vite.config.ts', 'backend/server/**/*'],
     rules: {
       'import/no-default-export': 'off',
     },
