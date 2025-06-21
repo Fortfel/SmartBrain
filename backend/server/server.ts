@@ -1,5 +1,5 @@
 import express, { type Request, type Response, type NextFunction } from 'express'
-import argon2 from 'argon2'
+import bcrypt from 'bcrypt'
 import cors from 'cors'
 import rateLimit from 'express-rate-limit'
 import helmet from 'helmet'
@@ -16,17 +16,12 @@ import { handleRemainingRequests } from './controllers/requests.js'
 import { checkAuthorization, checkRequestLimit, recordApiRequest } from './middleware/apiLimiter.js'
 
 /**
- * Hashes a password using argon2id algorithm
+ * Hashes a password using bcrypt algorithm
  * @param password - The plain text password to hash
  * @returns Promise resolving to the hashed password
  */
 export async function hashPassword(password: string): Promise<string> {
-  return await argon2.hash(password, {
-    type: argon2.argon2id,
-    memoryCost: config.password.memoryCost,
-    timeCost: config.password.timeCost,
-    parallelism: config.password.parallelism,
-  })
+  return await bcrypt.hash(password, config.password.saltRounds)
 }
 
 /**
@@ -36,7 +31,7 @@ export async function hashPassword(password: string): Promise<string> {
  * @returns Promise resolving to boolean indicating if password matches
  */
 export async function verifyPassword(hash: string, password: string): Promise<boolean> {
-  return await argon2.verify(hash, password)
+  return await bcrypt.compare(password, hash)
 }
 
 const app = express()

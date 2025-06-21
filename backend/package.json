@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@prisma/client": "^6.9.0",
-    "argon2": "^0.43.0",
+    "bcrypt": "^6.0.0",
     "clarifai-nodejs-grpc": "^11.5.5",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
@@ -27,6 +27,7 @@
     "helmet": "^8.1.0"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/node": "^24.0.1",

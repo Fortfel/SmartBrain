@@ -36,9 +36,10 @@ export const config = {
     resetDay: 1, // Reset on the first day of each month
   },
   password: {
-    memoryCost: 2 ** 16, // 64 MiB
-    timeCost: 3, // 3 iterations
-    parallelism: 1, // 1 degree of parallelism
+    saltRounds: 10,
+    // memoryCost: 2 ** 16, // 64 MiB
+    // timeCost: 3, // 3 iterations
+    // parallelism: 1, // 1 degree of parallelism
   },
 } as const
 
@@ -48,3 +49,5 @@ export type Config = typeof config
 if (config.security.allowedOrigins.length === 0) {
   throw new Error('ALLOWED_ORIGINS environment variable is required')
 }
+
+//todo: README, mention in README about the shared hosting and prisma uploading
