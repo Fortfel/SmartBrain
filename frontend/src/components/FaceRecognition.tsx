@@ -17,12 +17,21 @@ type FaceRecognitionProps = {
   faceRegions: Array<BoundingBox>
 }
 
+const LOW_CONFIDENCE_THRESHOLD = 0.9
+
 const FaceRecognition = ({ imageUrl, errorMessage, faceRegions }: FaceRecognitionProps): React.JSX.Element => {
   const { isAuthenticated, isAuthorized } = useAuth()
 
+  // Calculate if all faces are low confidence
+  const areAllFacesLowConfidence =
+    faceRegions.length > 0 && faceRegions.every((region) => region.value < LOW_CONFIDENCE_THRESHOLD)
+  const noFacesError = areAllFacesLowConfidence ? 'No faces detected' : ''
+
+  const displayError = errorMessage || noFacesError
+
   return (
     <div className="flex w-full flex-col items-center">
-      {errorMessage.length > 0 && isAuthenticated && (
+      {displayError.length > 0 && isAuthenticated && (
         <div className="alert-soft alert w-full max-w-lg alert-error">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -38,7 +47,7 @@ const FaceRecognition = ({ imageUrl, errorMessage, faceRegions }: FaceRecognitio
             />
           </svg>
           <div>
-            <span className="text-sm">{errorMessage}</span>
+            <span className="text-sm">{displayError}</span>
           </div>
         </div>
       )}
@@ -48,7 +57,7 @@ const FaceRecognition = ({ imageUrl, errorMessage, faceRegions }: FaceRecognitio
           {faceRegions.length > 0 && (
             <div className="absolute inset-0">
               {faceRegions.map((region, index) => {
-                if (region.value < 0.9) return null
+                if (region.value < LOW_CONFIDENCE_THRESHOLD) return null
 
                 const topRow = parseFloat(region.topRow)
                 const leftCol = parseFloat(region.leftCol)
