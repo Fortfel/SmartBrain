@@ -100,7 +100,7 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
   // Function to fetch remaining API requests
   const fetchRemainingRequests = async (userId: number): Promise<void> => {
     try {
-      const response = await fetch(`${API_URL}/api/requests/remaining?id=${userId.toString()}`)
+      const response = await fetch(`${API_URL}/requests/remaining?id=${userId.toString()}`)
 
       if (response.ok) {
         const data = (await response.json()) as RemainingRequestsResponse
@@ -160,7 +160,7 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
       try {
         setIsLoading(true)
 
-        const response = await fetch(API_URL + '/api/login', {
+        const response = await fetch(API_URL + '/login', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -217,7 +217,7 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
       try {
         setIsLoading(true)
 
-        const response = await fetch(API_URL + '/api/register', {
+        const response = await fetch(API_URL + '/register', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -297,7 +297,7 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
   const updateUserEntries = React.useCallback(
     async ({ id, imageUrl, detectionResults }: EntriesUpdateRequestBody): Promise<ImageEntryResponse> => {
       try {
-        const response = await fetch(API_URL + '/api/image', {
+        const response = await fetch(API_URL + '/image', {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',

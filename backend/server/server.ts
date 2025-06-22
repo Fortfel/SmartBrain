@@ -36,6 +36,9 @@ export async function verifyPassword(hash: string, password: string): Promise<bo
 
 const app = express()
 
+// Define base path for API routes
+const API_BASE_PATH = process.env.NODE_ENV === 'production' ? '/smartbrain-api' : ''
+
 // Security middleware
 app.use(
   helmet({
@@ -82,7 +85,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 app.use(express.json())
 
 // API Routes
-app.get('/api', async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+app.get(`${API_BASE_PATH}/`, async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const users = await prismaService.prisma.user.findMany({
       select: {
@@ -99,25 +102,25 @@ app.get('/api', async (_req: Request, res: Response, next: NextFunction): Promis
   }
 })
 
-app.post('/api/login', handleLogin)
+app.post(`${API_BASE_PATH}/login`, handleLogin)
 
-app.post('/api/register', handleRegister)
+app.post(`${API_BASE_PATH}/register`, handleRegister)
 
-app.get('/api/profile/:id', handleProfileGet)
+app.get(`${API_BASE_PATH}/profile/:id`, handleProfileGet)
 
-app.put('/api/image', handleEntriesUpdate)
+app.put(`${API_BASE_PATH}/image`, handleEntriesUpdate)
 
 // Apply API limiting middleware to the Clarifai endpoint
 app.post(
-  '/api/clarifai',
+  `${API_BASE_PATH}/clarifai`,
   checkAuthorization,
   checkRequestLimit,
-  recordApiRequest('/api/clarifai'),
+  recordApiRequest('/clarifai'),
   handleClarifaiRequest,
 )
 
 // Endpoint to check remaining API requests
-app.get('/api/requests/remaining', handleRemainingRequests)
+app.get(`${API_BASE_PATH}/requests/remaining`, handleRemainingRequests)
 
 // For production: serve the static files from the Vite build
 if (config.server.nodeEnv === 'production') {

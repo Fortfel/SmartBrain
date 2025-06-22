@@ -48,7 +48,7 @@ const MainContent = (): React.JSX.Element => {
     setfaceRegions([])
 
     try {
-      const response = await fetch(API_URL + '/api/clarifai', {
+      const response = await fetch(API_URL + '/clarifai', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
