@@ -19,7 +19,12 @@ const serverPort = process.env.PORT || 3000
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
+  // Base path for GitHub Pages deployment
+  // Use root path for development and repository name for production
+  const base = mode === 'production' ? '/SmartBrain/' : '/'
+  
   return {
+    base,
     plugins: [
       react(),
       tailwindcss(),
