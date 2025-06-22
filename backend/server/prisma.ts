@@ -75,10 +75,10 @@ class PrismaService {
       // eslint-disable-next-line @typescript-eslint/no-deprecated
       this.client.$use(async (params, next) => {
         const before = Date.now()
-        const result = void (await next(params))
+        const result = await next(params) // eslint-disable-line
         const after = Date.now()
         console.log(`Query ${params.model || 'unknown'}.${params.action} took ${(after - before).toString()}ms`)
-        return result
+        return result // eslint-disable-line
       })
     }
   }

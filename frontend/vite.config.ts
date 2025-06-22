@@ -22,7 +22,7 @@ export default defineConfig(({ mode }) => {
   // Base path for GitHub Pages deployment
   // Use root path for development and repository name for production
   const base = mode === 'production' ? '/SmartBrain/' : '/'
-  
+
   return {
     base,
     plugins: [
@@ -51,10 +51,22 @@ export default defineConfig(({ mode }) => {
       ...(mode === 'development' && {
         proxy: {
           // Proxy API requests to the Express server during development
-          '/api': {
+          '/smartbrain-api': {
             target: `http://localhost:${serverPort.toString()}`,
             changeOrigin: true,
             secure: false,
+            ws: true,
+            configure: (proxy, _options): void => {
+              proxy.on('error', (err, _req, _res) => {
+                console.log('proxy error', err)
+              })
+              proxy.on('proxyReq', (_proxyReq, req, _res) => {
+                console.log('Sending Request to the Target:', req.method, req.url)
+              })
+              proxy.on('proxyRes', (proxyRes, req, _res) => {
+                console.log('Received Response from the Target:', proxyRes.statusCode, req.url)
+              })
+            },
           },
         },
       }),

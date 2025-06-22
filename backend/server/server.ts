@@ -37,7 +37,7 @@ export async function verifyPassword(hash: string, password: string): Promise<bo
 const app = express()
 
 // Define base path for API routes
-const API_BASE_PATH = process.env.NODE_ENV === 'production' ? '/smartbrain-api' : ''
+const API_BASE_PATH = '/smartbrain-api'
 
 // Security middleware
 app.use(
@@ -123,15 +123,15 @@ app.post(
 app.get(`${API_BASE_PATH}/requests/remaining`, handleRemainingRequests)
 
 // For production: serve the static files from the Vite build
-if (config.server.nodeEnv === 'production') {
-  // Serve static files from the Vite build directory
-  app.use(express.static(config.server.distPath))
-
-  // Catch-all handler: send back index.html for any non-API routes
-  app.get('/*name', (_req: Request, res: Response): void => {
-    res.sendFile(`${config.server.distPath}/index.html`)
-  })
-}
+// if (config.server.nodeEnv === 'production') {
+//   // Serve static files from the Vite build directory
+//   app.use(express.static(config.server.distPath))
+//
+//   // Catch-all handler: send back index.html for any non-API routes
+//   app.get('/*name', (_req: Request, res: Response): void => {
+//     res.sendFile(`${config.server.distPath}/index.html`)
+//   })
+// }
 
 // 404 handler middleware
 app.use(notFoundHandler)

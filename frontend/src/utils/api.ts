@@ -7,7 +7,7 @@ const getApiBaseUrl = (): string => {
   if (import.meta.env.PROD) {
     return import.meta.env.VITE_API_URL as string
   } else {
-    return '' // Empty string to use proxy
+    return 'smartbrain-api' // Vite proxy
   }
 }
 
