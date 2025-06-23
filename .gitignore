@@ -25,3 +25,6 @@ dist-ssr
 
 ### gitguardian ###
 .cache_ggshield
+
+# Docs
+docs

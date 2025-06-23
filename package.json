@@ -28,7 +28,7 @@
     "prisma:generate": "npm run prisma:generate --workspace=backend",
     "prisma:studio": "npm run prisma:studio --workspace=backend",
     "prisma:push": "npm run prisma:push --workspace=backend",
-    "docs": "npm run docs"
+    "docs": "typedoc"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.1",
@@ -52,14 +52,15 @@
   },
   "typedocOptions": {
     "entryPoints": [
-      "frontend/src/main.tsx",
-      "frontend/src/utils/index.ts",
-      "backend/server/server.ts"
+      "frontend/src",
+      "backend/server"
     ],
+    "entryPointStrategy": "expand",
     "out": "docs",
     "tsconfig": "tsconfig.json",
     "includeVersion": true,
-    "readme": "README.md"
+    "readme": "README.md",
+    "highlightLanguages": ["typescript", "javascript", "sql", "json", "bash", "text"]
   },
   "browserslist": [
     "defaults"

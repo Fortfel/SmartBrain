@@ -49,5 +49,3 @@ export type Config = typeof config
 if (config.security.allowedOrigins.length === 0) {
   throw new Error('ALLOWED_ORIGINS environment variable is required')
 }
-
-//todo: README, mention in README about the shared hosting and prisma uploading
