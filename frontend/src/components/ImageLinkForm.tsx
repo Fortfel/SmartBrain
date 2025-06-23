@@ -1,13 +1,25 @@
 import * as React from 'react'
 import { useAuth } from '@/contexts'
 
-type ImageLinkFormProps = {
+/**
+ * Props for the ImageLinkForm component
+ * @param inputValue - Current value of the image URL input field
+ * @param onInputChange - Handler function for input field changes
+ * @param onPictureSubmit - Handler function for form submission
+ * @param isLoading - Flag indicating if image processing is in progress
+ */
+export type ImageLinkFormProps = {
   inputValue: string
   onInputChange: (event: React.ChangeEvent<HTMLInputElement>) => void
   onPictureSubmit: (event: React.MouseEvent<HTMLButtonElement>) => Promise<void>
   isLoading: boolean
 }
 
+/**
+ * Component that provides a form for users to input image URLs for face detection
+ * Includes validation for URL format and handles loading states
+ * @returns React component with input field and submit button for image URL processing
+ */
 const ImageLinkForm = ({
   inputValue,
   onInputChange,
@@ -16,9 +28,16 @@ const ImageLinkForm = ({
 }: ImageLinkFormProps): React.JSX.Element => {
   const { user, isAuthorized } = useAuth()
 
+  /**
+   * Reference to the input element for validation access
+   */
   const inputRef = React.useRef<HTMLInputElement>(null)
 
-  // Check validity before calling onPictureSubmit
+  /**
+   * Validates the input URL before submitting
+   * Only calls the onPictureSubmit handler if the input is valid
+   * @param event - Mouse click event from the submit button
+   */
   const handleButtonClick = (event: React.MouseEvent<HTMLButtonElement>): void => {
     if (inputRef.current && inputRef.current.validity.valid) {
       void onPictureSubmit(event)

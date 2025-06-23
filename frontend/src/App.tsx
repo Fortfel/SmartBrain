@@ -9,11 +9,21 @@ import { MainContent } from '@/components/MainContent.tsx'
 import { SignIn } from '@/components/SignIn/SignIn.tsx'
 import { useTheme, useAuth } from '@/contexts'
 
-// Configuration
+/**
+ * Configuration constants for the application
+ */
 const BRAIN_ANIMATION_DURATION = 1.8 // in seconds
 
+/**
+ * Memoized Particles component to prevent unnecessary re-renders
+ */
 const MemoizedParticles = React.memo(Particles)
 
+/**
+ * Main application component that orchestrates the entire UI
+ * Handles particle animations, theme management, and authentication
+ * @returns React component representing the entire application
+ */
 const App = (): React.JSX.Element => {
   const [areParticlesLoaded, setAreParticlesLoaded] = React.useState(false)
   const { theme, isDarkMode } = useTheme()
@@ -23,7 +33,15 @@ const App = (): React.JSX.Element => {
 
   const particlesOptionsWithTheme: ISourceOptions = particlesOoptionsLinks
 
+  /**
+   * Initializes the particles engine on component mount
+   * Loads the slim version of particles for better performance
+   */
   React.useEffect(() => {
+    /**
+     * Asynchronously initializes the particles engine
+     * @returns Promise resolving when particles are initialized
+     */
     const initializeParticles = async (): Promise<void> => {
       try {
         await initParticlesEngine(async (engine) => {
@@ -41,6 +59,12 @@ const App = (): React.JSX.Element => {
     void initializeParticles()
   }, [])
 
+  /**
+   * Callback executed when particles are loaded
+   * Applies the current theme to the particles container
+   * @param container - The particles container instance
+   * @returns Promise resolving when theme is applied
+   */
   const handleParticlesLoaded = React.useCallback(
     async (container?: Container): Promise<void> => {
       await container?.loadTheme(theme)
@@ -48,6 +72,10 @@ const App = (): React.JSX.Element => {
     [theme],
   )
 
+  /**
+   * Handles sign in button clicks
+   * Logs out if user is already signed in, otherwise shows login dialog
+   */
   const handleSignInClick = (): void => {
     if (user) {
       logout()

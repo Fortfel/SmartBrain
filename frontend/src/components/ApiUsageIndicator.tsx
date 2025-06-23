@@ -1,12 +1,19 @@
 import * as React from 'react'
 import { useAuth } from '@/contexts/use-auth'
 
-type ApiUsageIndicatorProps = {
+/**
+ * Props for the ApiUsageIndicator component
+ * @param className - Optional CSS class name for styling the component
+ */
+export type ApiUsageIndicatorProps = {
   className?: string
 }
 
 /**
  * Component to display the user's API usage and remaining requests
+ * Shows different UI states based on the number of remaining API requests
+ * Only renders when the user is both authenticated and authorized
+ * @returns React component displaying API usage information or null if user is not authenticated/authorized
  */
 const ApiUsageIndicator = ({ className = '' }: ApiUsageIndicatorProps): React.JSX.Element | null => {
   const { isAuthenticated, isAuthorized, requestsRemaining } = useAuth()
@@ -25,7 +32,13 @@ const ApiUsageIndicator = ({ className = '' }: ApiUsageIndicatorProps): React.JS
     )
   }
 
-  // Determine color based on remaining requests
+  /**
+   * Determines the text color based on the number of remaining API requests
+   * - Red: No requests remaining
+   * - Amber: 5 or fewer requests remaining
+   * - Green: More than 5 requests remaining
+   * @returns CSS class name for the appropriate text color
+   */
   const getStatusColor = (): string => {
     if (requestsRemaining <= 0) return 'text-red-600'
     if (requestsRemaining <= 5) return 'text-amber-500'

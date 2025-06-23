@@ -1,10 +1,19 @@
 import * as React from 'react'
 import { type RegisterResponse, useAuth } from '@/contexts'
 
-type RegisterProps = {
+/**
+ * Props for the Register component
+ * @param onSuccess - Callback function to execute when registration is successful
+ */
+export type RegisterProps = {
   onSuccess: () => void
 }
 
+/**
+ * Component that provides a registration form for new user accounts
+ * Handles form submission, validation, and displays error messages
+ * @returns React component with registration form interface
+ */
 const Register = ({ onSuccess }: RegisterProps): React.JSX.Element => {
   const [formState, formAction, isPending] = React.useActionState<RegisterResponse | null, FormData>(
     handleRegister,
@@ -14,6 +23,13 @@ const Register = ({ onSuccess }: RegisterProps): React.JSX.Element => {
   const [email, setEmail] = React.useState('')
   const { register } = useAuth()
 
+  /**
+   * Handles the registration form submission
+   * Extracts user details from form data and attempts to create a new account
+   * @param _prevState - Previous form state (unused)
+   * @param formData - Form data containing name, email and password
+   * @returns Promise resolving to registration response with success status and optional error
+   */
   async function handleRegister(_prevState: RegisterResponse | null, formData: FormData): Promise<RegisterResponse> {
     const name = formData.get('name') as string
     const email = formData.get('email') as string

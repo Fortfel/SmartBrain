@@ -3,6 +3,14 @@ import * as React from 'react'
 import placeholder from '@/assets/img/placeholder.png'
 import { useAuth } from '@/contexts'
 
+/**
+ * Represents the bounding box coordinates for a detected face
+ * @param value - Confidence value of the face detection (0-1)
+ * @param topRow - Top coordinate as a percentage string
+ * @param leftCol - Left coordinate as a percentage string
+ * @param bottomRow - Bottom coordinate as a percentage string
+ * @param rightCol - Right coordinate as a percentage string
+ */
 export type BoundingBox = {
   value: number
   topRow: string
@@ -11,22 +19,44 @@ export type BoundingBox = {
   rightCol: string
 }
 
-type FaceRecognitionProps = {
+/**
+ * Props for the FaceRecognition component
+ * @param imageUrl - URL of the image to display and process
+ * @param errorMessage - Error message to display if face detection fails
+ * @param faceRegions - Array of detected face regions with bounding boxes
+ */
+export type FaceRecognitionProps = {
   imageUrl: string
   errorMessage: string
   faceRegions: Array<BoundingBox>
 }
 
+/**
+ * Threshold below which a face detection is considered low confidence
+ * @readonly
+ */
 const LOW_CONFIDENCE_THRESHOLD = 0.9
 
+/**
+ * Component that displays an image with highlighted face regions
+ * Shows different UI states based on authentication status and detection results
+ *
+ * @returns React component displaying the image with face detection results
+ */
 const FaceRecognition = ({ imageUrl, errorMessage, faceRegions }: FaceRecognitionProps): React.JSX.Element => {
   const { isAuthenticated, isAuthorized } = useAuth()
 
-  // Calculate if all faces are low confidence
+  /**
+   * Determines if all detected faces are below the confidence threshold
+   * Used to display a "No faces detected" message when confidence is low
+   */
   const areAllFacesLowConfidence =
     faceRegions.length > 0 && faceRegions.every((region) => region.value < LOW_CONFIDENCE_THRESHOLD)
   const noFacesError = areAllFacesLowConfidence ? 'No faces detected' : ''
 
+  /**
+   * Combined error message to display (either from props or low confidence)
+   */
   const displayError = errorMessage || noFacesError
 
   return (

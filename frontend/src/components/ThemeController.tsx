@@ -1,6 +1,11 @@
 import * as React from 'react'
 import { useTheme } from '@/contexts'
 
+/**
+ * Component that provides a toggle switch for changing the application theme
+ * Uses a sun/moon icon swap animation to indicate the current theme state
+ * @returns React component with theme toggle switch
+ */
 const ThemeController = (): React.JSX.Element => {
   const { toggleTheme, isDarkMode } = useTheme()
 

@@ -9,37 +9,91 @@ import type {
 import { AuthContext } from '@/contexts/use-auth.ts'
 import { API_BASE_URL } from '@/utils/api.ts'
 
+/**
+ * Response type for login operations
+ * @param success - Whether the login operation was successful
+ * @param error - Optional error message if login failed
+ * @param user - Optional user data if login succeeded
+ */
 export type LoginResponse = {
   success: boolean
   error?: string
   user?: SafeUser
 }
 
+/**
+ * Response type for register operations
+ * @param success - Whether the registration operation was successful
+ * @param error - Optional error message if registration failed
+ * @param user - Optional user data if registration succeeded
+ */
 export type RegisterResponse = {
   success: boolean
   error?: string
   user?: SafeUser
 }
 
+/**
+ * Response type for logout operations
+ * @param success - Whether the logout operation was successful
+ * @param error - Optional error message if logout failed
+ */
 export type LogoutResponse = {
   success: boolean
   error?: string
 }
 
+/**
+ * Response type for image entry operations
+ * @param success - Whether the image entry operation was successful
+ * @param error - Optional error message if operation failed
+ * @param user - Optional updated user data if operation succeeded
+ */
 export type ImageEntryResponse = {
   success: boolean
   error?: string
   user?: SafeUser
 }
 
+/**
+ * Standard error response type
+ * @param error - Error message
+ */
 export type ErrorResponse = {
   error: string
 }
 
+/**
+ * Callback function type for login events
+ * @param user - The user that has logged in
+ */
 export type LoginCallback = (user: SafeUser) => void
+
+/**
+ * Callback function type for logout events
+ * @param user - The user that has logged out (or null)
+ */
 export type LogoutCallback = (user: SafeUser | null) => void
+
+/**
+ * Function type for unsubscribing from event callbacks
+ */
 export type UnsubscribeFunction = () => void
 
+/**
+ * Context type definition for authentication management
+ * @param user - Current authenticated user or null if not authenticated
+ * @param isLoading - Whether authentication operations are in progress
+ * @param isAuthenticated - Whether a user is currently authenticated
+ * @param isAuthorized - Whether the authenticated user has authorization
+ * @param requestsRemaining - Number of API requests remaining for the user
+ * @param login - Function to authenticate a user
+ * @param register - Function to register a new user
+ * @param logout - Function to log out the current user
+ * @param updateUserEntries - Function to update user entries after image processing
+ * @param onLogin - Function to register a callback for login events
+ * @param onLogout - Function to register a callback for logout events
+ */
 export type AuthContextType = {
   user: SafeUser | null
   isLoading: boolean
@@ -54,12 +108,21 @@ export type AuthContextType = {
   onLogout: (callback: LogoutCallback) => UnsubscribeFunction | undefined
 }
 
+/**
+ * Props for the AuthProvider component
+ * @param children - React nodes to be wrapped by the provider
+ */
 export type AuthProviderProps = {
   children: React.ReactNode
 }
 
 const API_URL = API_BASE_URL
 
+/**
+ * Provider component that makes authentication context available to all child components
+ * Manages user authentication state, session persistence, and API interactions
+ * @returns React component that provides authentication context to its children
+ */
 const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
   const [user, setUser] = React.useState<SafeUser | null>(null)
   const [isLoading, setIsLoading] = React.useState<boolean>(true)
@@ -71,7 +134,10 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
   const loginCallbacksRef = React.useRef<Set<LoginCallback>>(new Set())
   const logoutCallbacksRef = React.useRef<Set<LogoutCallback>>(new Set())
 
-  // Initialize auth state (check for existing session)
+  /**
+   * Initialize authentication state on component mount
+   * Checks for existing session in sessionStorage and restores user state
+   */
   React.useEffect(() => {
     try {
       const storedUser = sessionStorage.getItem('smart-brain-user')
@@ -97,7 +163,11 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
     }
   }, [])
 
-  // Function to fetch remaining API requests
+  /**
+   * Fetches the number of API requests remaining for a user
+   * @param userId - ID of the user to check remaining requests for
+   * @returns Promise resolving when the request completes
+   */
   const fetchRemainingRequests = async (userId: number): Promise<void> => {
     try {
       const response = await fetch(`${API_URL}/requests/remaining?id=${userId.toString()}`)
@@ -111,6 +181,11 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
     }
   }
 
+  /**
+   * Registers a callback function to be executed when a user logs in
+   * @param callback - Function to call when a user logs in
+   * @returns Function to unsubscribe the callback, or undefined if callback is invalid
+   */
   const onLogin = React.useCallback((callback: LoginCallback): UnsubscribeFunction | undefined => {
     if (typeof callback === 'function') {
       loginCallbacksRef.current.add(callback)
@@ -123,6 +198,11 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
     return
   }, [])
 
+  /**
+   * Registers a callback function to be executed when a user logs out
+   * @param callback - Function to call when a user logs out
+   * @returns Function to unsubscribe the callback, or undefined if callback is invalid
+   */
   const onLogout = React.useCallback((callback: LogoutCallback): UnsubscribeFunction | undefined => {
     if (typeof callback === 'function') {
       logoutCallbacksRef.current.add(callback)
@@ -135,6 +215,10 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
     return
   }, [])
 
+  /**
+   * Executes all registered login callbacks with the provided user
+   * @param user - User object to pass to callbacks
+   */
   const executeLoginCallbacks = React.useCallback((user: SafeUser) => {
     loginCallbacksRef.current.forEach((callback) => {
       try {
@@ -145,6 +229,10 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
     })
   }, [])
 
+  /**
+   * Executes all registered logout callbacks with the provided user
+   * @param user - User object to pass to callbacks (or null)
+   */
   const executeLogoutCallbacks = React.useCallback((user: SafeUser | null) => {
     logoutCallbacksRef.current.forEach((callback) => {
       try {
@@ -155,6 +243,11 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
     })
   }, [])
 
+  /**
+   * Authenticates a user with email and password
+   * @param credentials - Object containing email and password
+   * @returns Promise resolving to login response
+   */
   const login = React.useCallback(
     async ({ email, password }: LoginRequestBody): Promise<LoginResponse> => {
       try {
@@ -212,6 +305,11 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
     [executeLoginCallbacks],
   )
 
+  /**
+   * Registers a new user with name, email, and password
+   * @param request - Object containing registration details
+   * @returns Promise resolving to registration response
+   */
   const register = React.useCallback(
     async ({ name, email, password }: RegisterRequestBody): Promise<RegisterResponse> => {
       try {
@@ -264,6 +362,10 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
     [executeLoginCallbacks],
   )
 
+  /**
+   * Logs out the current user and clears authentication state
+   * @returns Logout response object
+   */
   const logout = React.useCallback((): LogoutResponse => {
     try {
       setIsLoading(true)
@@ -294,6 +396,11 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
     }
   }, [executeLogoutCallbacks, user])
 
+  /**
+   * Updates user entries after image processing
+   * @param request - Object containing image processing details
+   * @returns Promise resolving to image entry response
+   */
   const updateUserEntries = React.useCallback(
     async ({ id, imageUrl, detectionResults }: EntriesUpdateRequestBody): Promise<ImageEntryResponse> => {
       try {
@@ -346,7 +453,10 @@ const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
     [],
   )
 
-  // Memoize the context value to prevent unnecessary re-renders
+  /**
+   * Memoized context value to prevent unnecessary re-renders of consuming components
+   * Only updates when authentication state or methods change
+   */
   const contextValue = React.useMemo(
     () => ({
       user,

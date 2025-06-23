@@ -9,18 +9,35 @@ import { particlesOptionsPolygon } from '@/assets/particlesOptions.ts'
 import { Navigation, type NavigationProps } from '@/components/Navigation.tsx'
 import { useTheme } from '@/contexts'
 
-type HeaderProps = {
+/**
+ * Props for the Header component
+ * @param brainAnimationDuration - Duration of the brain animation in seconds
+ * @remarks This type extends NavigationProps, inheriting all its properties
+ */
+export type HeaderProps = {
   brainAnimationDuration: number
 } & NavigationProps
 
+/**
+ * Memoized Particles component to prevent unnecessary re-renders
+ */
 const MemoizedParticles = React.memo(Particles)
 
+/**
+ * Header component that displays the navigation bar and animated brain logo
+ * Manages particle animations and theme integration
+ * @returns React component representing the application header
+ */
 const Header = ({ brainAnimationDuration, ...navigationProps }: HeaderProps): React.JSX.Element => {
   const [areParticlesLoaded, setAreParticlesLoaded] = React.useState(false)
   const { theme } = useTheme()
 
   const particlesOptionsWithTheme: ISourceOptions = particlesOptionsPolygon
 
+  /**
+   * Initializes the particles engine on component mount
+   * Loads the slim version of particles and polygon mask plugin
+   */
   React.useEffect(() => {
     initParticlesEngine(async (engine) => {
       // We could either run loadAll(engine) only or separately loadSlim(engine) and loadPolygonMaskPlugin(engine)
@@ -37,6 +54,12 @@ const Header = ({ brainAnimationDuration, ...navigationProps }: HeaderProps): Re
       })
   }, [])
 
+  /**
+   * Callback executed when particles are loaded
+   * Applies the current theme to the particles container
+   * @param container - The particles container instance
+   * @returns Promise resolving when theme is applied
+   */
   const handleParticlesLoaded = React.useCallback(
     async (container?: Container) => {
       await container?.loadTheme(theme)
@@ -44,6 +67,10 @@ const Header = ({ brainAnimationDuration, ...navigationProps }: HeaderProps): Re
     [theme],
   )
 
+  /**
+   * CSS classes for the shiny animation effect on the brain logo
+   * Uses conditional classes based on theme and animation settings
+   */
   const shinyEffect = clsx('absolute inset-0', {
     // animation
     'animate-shiny animate-shiny-duration-(--brain-animation-duration)': true,

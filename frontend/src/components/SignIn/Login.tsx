@@ -1,15 +1,31 @@
 import * as React from 'react'
 import { type LoginResponse, useAuth } from '@/contexts'
 
-type LoginProps = {
+/**
+ * Props for the Login component
+ * @param onSuccess - Callback function to execute when login is successful
+ */
+export type LoginProps = {
   onSuccess: () => void
 }
 
+/**
+ * Component that provides a login form for user authentication
+ * Handles form submission, validation, and displays error messages
+ * @returns React component with login form interface
+ */
 const Login = ({ onSuccess }: LoginProps): React.JSX.Element => {
   const [formState, formAction, isPending] = React.useActionState<LoginResponse | null, FormData>(handleLogin, null)
   const [email, setEmail] = React.useState('')
   const { login } = useAuth()
 
+  /**
+   * Handles the login form submission
+   * Extracts credentials from form data and attempts to authenticate the user
+   * @param _prevState - Previous form state (unused)
+   * @param formData - Form data containing email and password
+   * @returns Promise resolving to login response with success status and optional error
+   */
   async function handleLogin(_prevState: LoginResponse | null, formData: FormData): Promise<LoginResponse> {
     const email = formData.get('email') as string
     const password = formData.get('password') as string

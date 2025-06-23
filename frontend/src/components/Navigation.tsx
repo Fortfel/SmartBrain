@@ -3,10 +3,19 @@ import Brain from '@/assets/img/Brain.tsx'
 import { ThemeController } from '@/components/ThemeController.tsx'
 import { useAuth } from '@/contexts'
 
+/**
+ * Props for the Navigation component
+ * @param onSignInClick - Callback function triggered when sign in/out button is clicked
+ */
 export type NavigationProps = {
   onSignInClick: () => void
 }
 
+/**
+ * Navigation component that displays the app header with logo, sign in/out button, and theme controller
+ * Adapts its display based on authentication state
+ * @returns React component representing the navigation bar
+ */
 const Navigation = ({ onSignInClick }: NavigationProps): React.JSX.Element => {
   const { user } = useAuth()
 

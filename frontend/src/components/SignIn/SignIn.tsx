@@ -3,15 +3,27 @@ import SvgBrain from '@/assets/img/Brain.tsx'
 import { Login } from '@/components/SignIn/Login.tsx'
 import { Register } from '@/components/SignIn/Register.tsx'
 
-type SignInProps = {
+/**
+ * Props for the SignIn component
+ * @param ref - Reference to the dialog element for controlling modal visibility
+ */
+export type SignInProps = {
   ref: React.RefObject<HTMLDialogElement | null>
 }
 
+/**
+ * Modal component that handles user authentication
+ * Provides both login and registration interfaces with toggling between them
+ * @returns React component with authentication modal dialog
+ */
 const SignIn = ({ ref }: SignInProps): React.JSX.Element => {
   const [route, setRoute] = React.useState('login')
 
   const isLoginRoute = route === 'login'
 
+  /**
+   * Closes the authentication modal dialog
+   */
   const closeModal = (): void => {
     ref.current?.close()
   }

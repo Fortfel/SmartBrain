@@ -8,6 +8,11 @@ import { API_BASE_URL } from '@/utils/api.ts'
 
 const API_URL = API_BASE_URL
 
+/**
+ * Main content component that handles image processing and face recognition
+ * Manages form input, API interactions, and displays results
+ * @returns React component representing the main content area
+ */
 const MainContent = (): React.JSX.Element => {
   const [inputValue, setInputValue] = React.useState('') //https://samples.clarifai.com/metro-north.jpg
   const [imageUrl, setImageUrl] = React.useState('')
@@ -16,6 +21,10 @@ const MainContent = (): React.JSX.Element => {
   const [faceRegions, setfaceRegions] = React.useState<Array<BoundingBox>>([])
   const { user, updateUserEntries, onLogout } = useAuth()
 
+  /**
+   * Effect to reset component state when user logs out
+   * Registers a callback with the auth context's onLogout method
+   */
   React.useEffect(() => {
     const unsubscribe = onLogout(() => {
       // Reset states
@@ -30,10 +39,20 @@ const MainContent = (): React.JSX.Element => {
     }
   }, [onLogout])
 
+  /**
+   * Handles changes to the image URL input field
+   * @param e - Input change event
+   */
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     setInputValue(e.target.value)
   }
 
+  /**
+   * Handles submission of an image URL for face detection
+   * Processes the image through Clarifai API and updates user entries
+   * @param e - Mouse event from button click
+   * @returns Promise resolving when processing completes
+   */
   const handlePictureSubmit = async (e: React.MouseEvent<HTMLButtonElement>): Promise<void> => {
     if (!user) {
       setErrorMessage('Please sign in to use this feature')
