@@ -56,11 +56,14 @@
       "backend/server"
     ],
     "entryPointStrategy": "expand",
+    "exclude": ["**/*.test.ts", "**/*.spec.ts"],
     "out": "docs",
     "tsconfig": "tsconfig.json",
     "includeVersion": true,
     "readme": "README.md",
-    "highlightLanguages": ["typescript", "javascript", "sql", "json", "bash", "text"]
+    "highlightLanguages": ["typescript", "javascript", "sql", "json", "bash", "text"],
+    "excludePrivate": true,
+    "excludeInternal": true
   },
   "browserslist": [
     "defaults"
