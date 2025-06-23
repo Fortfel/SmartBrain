@@ -91,7 +91,19 @@ const MainContent = (): React.JSX.Element => {
 
       const boundingBoxes = (await response.json()) as Array<ProcessedBoundingBox>
 
-      setfaceRegions(boundingBoxes)
+      setfaceRegions(() => {
+        return boundingBoxes.length > 0
+          ? boundingBoxes
+          : [
+              {
+                topRow: '0',
+                rightCol: '0',
+                bottomRow: '0',
+                leftCol: '0',
+                value: 0,
+              },
+            ]
+      })
 
       // Update user entries
       const updatedUser = await updateUserEntries({
